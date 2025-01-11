@@ -1,0 +1,165 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    {% set facebook = links|filter(l => l.platform == 'facebook')  %}
+	{% set linkedin = links|filter(l => l.platform == 'linkedin')  %}
+	{% set github = links|filter(l => l.platform == 'github')  %}
+	{% set instagram = links|filter(l => l.platform == 'intagram')  %}
+	{% set twitter = links|filter(l => l.platform == 'twitter')  %}
+	<h4 class="fw-bold py-3 mb-4">
+		<span class="text-muted fw-light">Profile </span></h4>
+	<div class="row">
+		<div class="col-md-12">
+			<form id="accountUpdateForm" enctype="multipart/form-data" class="card mb-4">
+				<h5 class="card-header">Profile Details</h5>
+				<!-- Account -->
+				<div class="card-body pt-3">
+					<div class="d-flex align-items-start align-items-sm-center gap-4">
+						<div>
+							<img style="object-fit:cover;" src="{{ asset(user.imagePath != null ? user.imagePath : 'assets/img/avatars/no-avatar.png') }}" alt="user-avatar" class="d-block rounded shadow" height="100" width="100" id="uploadedAvatar"/>
+						</div>
+					</div>
+				</div>
+				<hr class="my-0"/>
+				<div class="card-body">
+					<div class="row">
+						<div class="mb-3 col-md-6">
+							<label for="firstName" class="form-label">First Name</label>
+							<input class="form-control" type="text" id="firstName" name="firstName" value="{{ user.firstName }}"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="lastName" class="form-label">Last Name</label>
+							<input class="form-control" type="text" name="lastName" id="lastName" value="{{ user.lastName }}"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="dob" class="form-label">Date of birth</label>
+							<input class="form-control" type="date" name="dob" id="dob" value="{{ user.dateOfBirth }}"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="email" class="form-label">E-mail</label>
+							<input class="form-control" type="text" id="email" name="email" value="{{ user.email }}" placeholder="john.doe@example.com"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label class="form-label" for="phoneNumber">Phone Number</label>
+							<div class="input-group input-group-merge">
+								<input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="{{ user.phoneNumber }}" placeholder="202 555 0111"/>
+							</div>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="address" class="form-label">Address</label>
+							<input type="text" class="form-control" id="address" name="address" value="{{ user.address }}" placeholder="Address"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="state" class="form-label">State</label>
+							<input class="form-control" type="text" id="state" name="state" value="{{ user.state }}" placeholder="California"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label for="zipCode" class="form-label">Zip Code</label>
+							<input type="text" class="form-control" id="zipCode" name="zipCode" value="{{ user.zipCode }}" placeholder="231465" maxlength="6"/>
+						</div>
+						<div class="mb-3 col-md-6">
+							<label class="form-label" for="country">Country</label>
+							<input id="country" name="country" placeholder="country" value="{{ user.country }}" class="form-control">
+						</div>
+					</div>
+				</div>
+				<!-- /Account -->
+			</form>
+		</div>
+        <div class="col-12">
+            <div class="card">
+                <h5 class="card-header">Social Accounts</h5>
+                <div class="card-body">
+                    <!-- Social Accounts -->
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('assets/img/icons/brands/facebook.png') }}" alt="facebook" class="me-3" height="30"/>
+                        </div>
+                        <div class="flex-grow-1 row">
+                            <div class="col-8 col-sm-7 mb-sm-0 mb-2">
+                                <h6 class="mb-0">Facebook</h6>
+                                {% if facebook is not empty %}
+                                    <a href="{{ facebook[0].url }}" target="_blank">@Connected</a>
+                                {% else %}
+                                    <small class="text-muted">Not Connected</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('assets/img/icons/brands/twitter.png') }}" alt="twitter" class="me-3" height="30"/>
+                        </div>
+                        <div class="flex-grow-1 row">
+                            <div class="col-8 col-sm-7 mb-sm-0 mb-2">
+                                <h6 class="mb-0">Twitter</h6>
+                                {% if twitter is not empty %}
+                                    <a href="{{ twitter[0].url }}" target="_blank">@Connected</a>
+                                {% else %}
+                                    <small class="text-muted">Not Connected</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="{{asset('assets/img/icons/brands/instagram.png')}}" alt="instagram" class="me-3" height="30"/>
+                        </div>
+                        <div class="flex-grow-1 row">
+                            <div class="col-8 col-sm-7 mb-sm-0 mb-2">
+                                <h6 class="mb-0">instagram</h6>
+                                {% if instagram is not empty %}
+                                    <a href="{{ instagram[0].url }}" target="_blank">@Connected</a>
+                                {% else %}
+                                    <small class="text-muted">Not Connected</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('assets/img/icons/brands/github.png') }}" alt="dribbble" class="me-3" height="30"/>
+                        </div>
+                        <div class="flex-grow-1 row">
+                            <div class="col-8 col-sm-7 mb-sm-0 mb-2">
+                                <h6 class="mb-0">Github</h6>
+                                {% if github is not empty %}
+                                    <a href="{{ github[0].url }}" target="_blank">@Connected</a>
+                                {% else %}
+                                    <small class="text-muted">Not Connected</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('assets/img/icons/brands/linkedin.png') }}" alt="behance" class="me-3" height="30"/>
+                        </div>
+                        <div class="flex-grow-1 row">
+                            <div class="col-8 col-sm-7 mb-sm-0 mb-2">
+                                <h6 class="mb-0">LinkedIn</h6>
+                                {% if linkedin is not empty %}
+                                    <a href="{{ linkedin[0].url }}" target="_blank">@Connected</a>
+                                {% else %}
+                                    <small class="text-muted">Not Connected</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Social Accounts -->
+                </div>
+            </div>
+        </div>
+	</div>
+    {% block javascript %}
+        <script>
+            //set active page
+            $('#members').toggleClass('active');
+        </script>
+        <script>
+            $(document).ready(function(){
+                $('input').attr('readonly', true);
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

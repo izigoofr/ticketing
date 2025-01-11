@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Sandbox{% endblock %}
+
+{% block content %}
+    <h1>Edit Sandbox</h1>
+
+    {{ include('sandbox/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_sandbox_index') }}">back to list</a>
+
+
+{% endblock %}

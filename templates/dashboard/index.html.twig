@@ -1,0 +1,298 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    {% set taskCounts = {} %}
+	{% for day in last7days %}
+		{% set tasks = task_list|filter(task => task.status == 'Finished' and task.enddate|date('Y-m-d') == day) %}
+		{% set taskCounts = taskCounts|merge([tasks|length]) %}
+	{% endfor %}
+	<div id="data" class="d-none" data-task-counts="{{ taskCounts|json_encode|raw }}" ></div>
+
+	<div class="row gy-4">
+		<div class="col-lg-8 mb-4  mini-card">
+			<div class="card h-100">
+				<div class="d-flex align-items-end row">
+					<div class="col-sm-7">
+						<div class="card-body text-center text-md-start">
+							<h5 class="card-title text-primary">
+								Welcom Back {{ app.user.firstName }}!
+							</h5>
+							<p class="mb-4">
+								Favoriser la réussite, guider le progrès<br/>
+								Voici votre plateforme centrale d'analyse et de recherche de données
+							</p>
+						</div>
+					</div>
+					<div class="col-sm-5 text-center text-sm-left position-absolute" style="right: 10px;bottom: 0;">
+						<div class="card-body pb-5 px-0 px-md-4">
+						<img src="https://medias.florajet.com/_w_/design/v32/logo/HD/logo_2025.webp?w=230" alt="Logo" >
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% if app.user.isMenu == true %}
+		<div class="col-lg-2 text-center  col-md-4 col-6 mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx-comment-dots text-dark mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Unread<br>
+						Messages</span>
+					<h3 class="card-title mb-2">{{ messages|filter(m => m.status == 0)|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center  col-md-4 col-6 mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bxs-user text-info mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Registred
+						<br/>
+						Members</span>
+					<h3 class="card-title text-info mb-2">{{ member_list|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center  col-md-4 col-6 mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx-question-mark text-dark mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Number of<br>
+						Projects</span>
+					<h3 class="card-title mb-2">{{ project_list|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center col-md-4 col-6 mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx-check-square text-success mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Finished
+						<br/>
+						Projects</span>
+					<h3 class="card-title text-success mb-2">{{ project_list|filter(p => p.status == 'Finished')|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center col-md-4 col-6 mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bxs-stopwatch text-warning mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Pending / Not<br> Started
+						Projects</span>
+					<h3 class="card-title text-warning mb-2">{{ project_list|filter(p => p.status == 'Pending' or p.status == 'Not Started Yet')|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center col-md-4 col-6  mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx bx-timer text-primary mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Projects In
+						<br/>
+						Progress</span>
+					<h3 class="card-title text-primary mb-2">{{ project_list|filter(p => p.status == 'In Progress')|length }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center col-md-4 col-6  mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx bx-cart text-primary mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">Number Of
+						<br/>
+						Orders</span>
+					<h3 class="card-title text-primary mb-2">todo</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 text-center col-md-4 col-6  mini-card">
+			<div class="card h-100">
+				<div class="card-body">
+					<i class="bx bx bx-group  text-primary mb-1 fs-2"></i>
+					<span class="fw-semibold d-block mb-1">number of
+						<br/>
+						Visitors</span>
+					<h3 class="card-title text-primary mb-2">todo</h3>
+				</div>
+			</div>
+		</div>
+
+		{% if app.user.isMenu == true %}
+		<div class="col-12 col-lg-8">
+			<div class="card h-100">
+				<h5 class="card-header m-0 me-2 pb-3">Tasks per developer</h5>
+				<div class="card-body">
+					<canvas id="taskChart" height="250" width="350"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 col-lg-4">
+			<div class="card h-100">
+				<h5 class="card-header m-0 me-2">Projects status</h5>
+				<div class="card shadow-none mx-4 rounded-0 table-responsive">
+					<div class="card-body px-0">
+						<table class="table border text-center">
+							<thead>
+								<tr>
+									<th class="fw-bold">Project</th>
+									<th class="fw-bold">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for project in project_list %}
+                                    <tr>
+                                        <td>{{ project.title }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if project.status == 'Not Started Yet' %}
+                                                    bg-label-dark
+                                                {% elseif project.status == 'Pending' %}
+                                                    bg-label-info
+                                                {% elseif project.status == 'In Progress' %}
+                                                    bg-label-primary
+                                                {% elseif project.status == 'Finished' %}
+                                                    bg-label-success
+                                                {% endif %}
+                                                me-1">
+                                                {{ project.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card mt-5">
+
+
+
+
+
+<table class="table table-hover table-bordered align-middle">
+  <thead class="table-info text-center">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Project Name</th>
+      <th scope="col">Task Count</th>
+      <th scope="col">Total Days</th>
+      <th scope="col">Tasks by Status</th>
+      <th scope="col">Assigned Users</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for data in project_task_data %}
+      <tr>
+        <th scope="row" class="text-center">{{ loop.index }}</th>
+        <td>{{ data.projectName }}</td>
+        <td class="text-center">{{ data.taskCount }}</td>
+        <td class="text-center">{{ data.totalDays }}</td>
+        <td>
+          <ul class="list-unstyled mb-0">
+            <li>
+              <span class="badge" style="background-color:rgb(245, 43, 43); color: white;">Not Started Yet:</span>
+              <b>{{ data.statusCounts['Not Started Yet'] }}</b>
+            </li>
+            <li>
+              <span class="badge" style="background-color:rgb(252, 122, 0); color: white;">In Progress:</span>
+              <b>{{ data.statusCounts['In Progress'] }}</b>
+            </li>
+            <li>
+              <span class="badge" style="background-color:rgb(1, 255, 43); color: white;">Finished:</span>
+              <b>{{ data.statusCounts['Finished'] }}</b>
+            </li>
+          </ul>
+        </td>
+        <td>
+          {% if data.userNames is not empty %}
+            <ul class="list-unstyled mb-0">
+              {% for userName in data.userNames %}
+                <li>
+                  <span class="badge bg-info text-dark">{{ userName }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="text-muted">No users assigned</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+{% endif %}
+
+
+{% endif %}
+
+
+</div>
+    <script src="{{ asset('assets/js/chart.js') }}"></script>
+    {% block javascript %}
+        <script>
+            //set active page
+            $('#dashboard').toggleClass('active');
+        </script>
+
+	  <script>
+    const ctx = document.getElementById('taskChart').getContext('2d');
+
+    // Les données regroupées par utilisateur
+    const tasksByUser = {{ tasks_by_user|json_encode|raw }};
+
+    // Extraction des utilisateurs et des données par statut
+    const users = Object.keys(tasksByUser);
+    const statuses = ['Not Started Yet', 'In Progress', 'Finished'];
+    const datasets = statuses.map(status => {
+        return {
+            label: status,
+            data: users.map(user => tasksByUser[user][status]),
+            borderWidth: 1
+        };
+    });
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: users, // Les noms des utilisateurs
+            datasets: datasets, // Les tâches par statut
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nombre de tâches par utilisateur'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1, // Assure que les ticks augmentent par 1
+                        callback: function(value) {
+                            if (Number.isInteger(value)) {
+                                return value; // Affiche uniquement les entiers
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
+    {% endblock %}
+{% endblock %}

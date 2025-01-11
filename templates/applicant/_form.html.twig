@@ -1,0 +1,43 @@
+<div class="form-container">
+    <button type="reset" class="btn btn-secondary">Reset</button>
+    {{ form_start(form) }}
+    <div class="form-group">
+        {{ form_label(form.title, 'Title') }}
+        {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.content, 'Detail Action') }}
+        {{ form_widget(form.content) }}
+    </div>
+    <div class="row">
+
+
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="form-group">
+        {{ form_label(form.client, 'Service') }}
+        {{ form_widget(form.client, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.attachment, 'Upload File') }}
+        {{ form_widget(form.attachment, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.sandboxes, 'Sandbox') }}
+        {{ form_widget(form.sandboxes, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+
+    <div class="form-buttons">
+
+        <button type="submit" class="btn btn-primary mt-3">Save</button>
+    </div>
+    {{ form_end(form) }}
+
+
+
+
+</div>

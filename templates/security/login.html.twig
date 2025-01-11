@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ include('components/head.html.twig') }}
+        <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}">
+	</head>
+	<body>
+		<div class="container-xxl">
+			<div class="authentication-wrapper authentication-basic container-p-y">
+				<div
+					class="authentication-inner">
+					<div class="card">
+						<div
+							class="card-body">
+							<!-- Logo -->
+							<div class="app-brand justify-content-center">
+								<img src="https://medias.florajet.com/_w_/design/v32/logo/HD/logo_2025.webp?w=230" alt="Logo" >
+							</div>
+							<!-- /Logo -->
+							
+							<form id="formAuthentication" class="mb-3" action="" method="POST">
+								<div class="mb-3">
+									<label for="email" class="form-label">Email or Username</label>
+									<input class="form-control" type="email"  name="email" id="inputEmail" placeholder="Enter your email" autocomplete="email" required autofocus/>
+								</div>
+								<div class="mb-3 form-password-toggle">
+									<div class="d-flex justify-content-between">
+										<label class="form-label" for="password">Password</label>
+									</div>
+									<div class="input-group input-group-merge">
+										<input  type="password" name="password" id="inputPassword" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" autocomplete="current-password" required/>
+										<span class="input-group-text cursor-pointer">
+											<i class="bx bx-hide"></i>
+										</span>
+									</div>
+									<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+								</div>
+								<div class="mb-3">
+									<button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+    {{ include('components/scripts.html.twig') }}
+	<script>
+		$(document).ready(function(){
+			$('#formAuthentication').submit(function(event){
+				event.preventDefault();
+				$.ajax({
+					url: "{{ path('app_login') }}",
+					method: 'POST',
+					data: $(this).serialize()
+				}).then((response) => {
+					if(response == 'Invalid Credential'){
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: 'Invalid Credential !',
+							confirmButtonColor: '#3085d6',
+							confirmButtonText: 'OK'
+						});
+					}else{
+						Swal.fire({
+							icon: 'success',
+							title: 'Authenticated',
+							confirmButtonColor: '#3085d6',
+							confirmButtonText: 'OK',
+							timer: 2000,
+						}).then(function(){
+							window.location.href = response;
+						});
+						
+					}
+				})
+			})
+		})
+	</script>
+</html>

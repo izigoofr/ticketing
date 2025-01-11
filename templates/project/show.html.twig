@@ -1,0 +1,290 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	<h4 class="fw-bold py-3 mb-4">
+		Projects Analytics
+	</h4>
+	<div class="card mb-4">
+		<h5 class="card-header">{{ project.title }}</h5>
+		<div class="table-responsive text-nowarp">
+			<table class="table">
+				<tbody class="table-border-bottom-0">
+					<tr class="border-top">
+						<td>
+							<span class="fw-bold">Manager :
+							</span>
+                            {{ project.user.firstName ~ ' ' ~ project.user.lastName }}
+						</td>
+						<td>
+							<span class="fw-bold">Team :</span>
+                            {{ project.team.name }}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="fw-bold">Start date :
+							</span>
+							<span class="text-info">{{ project.startDate }}</span>
+						</td>
+						<td>
+							<span class="fw-bold">DeadLine :
+							</span>
+							<span class="text-warning">{{ project.deadLine }}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="fw-bold">
+								Service :
+							</span>
+							<span>{{ project.client.firstName ~ ' ' ~ project.client.lastName }}</span>
+						</td>
+						<td>
+							<span class="fw-bold">
+								Status :
+							</span>
+							<span class="badge 
+                                {% if project.status == 'Not Started Yet' %}
+                                    bg-label-dark
+                                {% elseif project.status == 'Pending' %}
+                                    bg-label-info
+                                {% elseif project.status == 'In Progress' %}
+                                    bg-label-primary
+                                {% elseif project.status == 'Finished' %}
+                                    bg-label-success
+                                {% endif %}
+                            me-1">{{ project.status }}</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="card py-2 mb-4">
+    <h5 class="card-header pt-3 pb-1 m-0">Project Tags</h5>
+    <input type="text" name="tags" id="tags" 
+           value="{% if project.tags|length > 0 %}{{ project.tags|map(tag => tag.name)|join(', ') }}{% else %}{% endif %}" 
+           class="form-control py-1 px-3 shadow-none border-0">
+</div>
+
+	<div class="row mb-4 gy-3">
+		<div class="col-12  col-xl-4">
+			<div class="row g-3">
+				<div class="col-6">
+					<div class="card text-center">
+						<div class="card-header px-3 pt-3 pb-2">
+							<i class='bx bx-question-mark text-dark mb-1 fs-3'></i>
+							<h5 class="p-0 m-0">Number of<br>
+								Tasks</h5>
+						</div>
+						<div class="card-body pb-2">
+							<span class="text-dark">{{ tasks|length }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="card text-center">
+						<div class="card-header px-3 pt-3 pb-2">
+							<i class='bx bx-check-square text-success mb-1 fs-3'></i>
+							<h5 class="p-0 m-0">Finished<br>
+								Tasks</h5>
+						</div>
+						<div class="card-body pb-2">
+							<span class="text-success">{{ tasks|filter(t => t.status == 'Finished')|length }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="card text-center">
+						<div class="card-header px-3 pt-3 pb-2">
+							<i class='bx bxs-stopwatch text-warning mb-1 fs-3'></i>
+							<h5 class="p-0 m-0">Pending<br>
+								Tasks</h5>
+						</div>
+						<div class="card-body pb-2">
+							<span class="text-warning">{{ tasks|filter(t => t.status == 'Pending')|length }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="card text-center">
+						<div class="card-header px-3 pt-3 pb-2">
+							<i class='bx bx-timer text-primary mb-1 fs-3'></i>
+							<h5 class="p-0 m-0">Tasks in<br>
+								Progress</h5>
+						</div>
+						<div class="card-body pb-2">
+							<span class="text-primary">{{ tasks|filter(t => t.status == 'In Progress')|length }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12  col-xl-8">
+			<div class="card h-100 p-comments-container" style="height: 265px !important;">
+				<div class="card-header border-bottom">
+					<h5 class="m-0">Project comments</h5>
+				</div>
+				<div class="card-body py-2 content">
+					<div class="row g-2" id="project_comments">
+						{% if comments is not empty %}
+                            {% for comment in comments %}
+                                <div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+									<img src="{{ asset(comment.user.imagePath != null ? comment.user.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar rounded-circle"/>
+									<div class="d-flex flex-column">
+										<p class="p-0 m-0 fw-bold">{{ comment.user.firstName ~ ' ' ~ comment.user.lastName }}</p>
+										<div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+											<p class="mb-1">
+												{{ comment.content }}
+											</p>
+											<p class="m-0" style="font-size: .6rem;">{{ comment.createdAt|date('Y-m-d H:m:s') }}</p>
+										</div>
+									</div>
+								</div>
+                            {% endfor %}
+                        {% else %}
+                            <h6 class="text-center py-2 lead">No comments yet</h6>
+                        {% endif %}
+					</div>
+				</div>
+				<div class="card-footer border-top py-3">
+					<button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#new_comment_modal">
+						add new comment
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card mb-5">
+		<div class="card-header border-bottom">
+			<h5 class="card-title p-0 m-0">Manager Reports</h5>
+		</div>
+		<div class="card-body">
+			<div class="accordion mt-3" id="reports">
+				{% if reports is not empty %}
+                    {% for report in reports %}
+                        <div class="card accordion-item">
+                            <h2 class="accordion-header" id="heading_{{ loop.index }}">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordion_{{ loop.index }}" aria-expanded="true" aria-controls="accordionOne">
+                                    {{ 'Report ' ~ loop.index }}
+                                </button>
+                            </h2>
+
+                            <div id="accordion_{{ loop.index }}" class="accordion-collapse collapse {{ loop.first ? 'show' : '' }}" data-bs-parent="#reports">
+                                <div class="accordion-body">
+                                    {{ report.description }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <h6 class="lead text-center">
+                        No reports yet
+                    </h6>
+                {% endif %}
+			</div>
+		</div>
+	</div>
+	<!--new comment modal-->
+			<form id="new_comment_form">
+				<div class="modal fade" id="new_comment_modal" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Add new Comment</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body py-1">
+								<div class="row">
+									<div class="col">
+										<textarea name="content" id="projectCommentContent" class="form-control" cols="30" rows="5" placeholder="write your comment here.."></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer pb-2">
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+									Close
+								</button>
+								<button type="submit" class="btn btn-primary">
+									Submit
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+    <!--tagify path-->
+    <script src="{{ asset('assets/js/tagify.min.js') }}"></script>
+    {% block javascript %}
+        <script>
+            //set active page
+            $('#projects').toggleClass('active');
+        </script>
+        <script>
+            let tags = document.querySelector('input[name=tags]');
+            new Tagify(tags);
+        </script>
+		<script>
+			$(document).ready(function(){
+				$('#new_comment_form').submit(function(event){
+					event.preventDefault();
+					let content = $('#projectCommentContent');
+					let isValid = true;
+					if(content.val() === ''){
+						isValid = false;
+						content.toggleClass('error');
+					}else{
+						content.removeClass('error');
+					}
+					if(isValid){
+						Swal.fire({
+						icon: 'warning',
+						title: 'Confirmation',
+						text: 'Are you sure you want to add this comment?',
+						showCancelButton: true,
+						confirmButtonColor: '#1E90FF',
+						cancelButtonColor: '#3085d6',
+						confirmButtonText: 'Add',
+						cancelButtonText: 'Cancel'
+					}).then((result) => {
+						if(result.isConfirmed){
+							let url = "{{ path('new_project_comment', {id: project.id}) }}";
+							$.ajax({
+								url: url,
+								method: 'POST',
+								data: $(this).serialize()
+							}).then((response) => {
+								if (!jQuery.isEmptyObject(response)) {
+										$('#new_comment_modal').modal('hide');
+										$('#projectCommentContent').val('');
+										const commentHtml = `<div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+																<img src="{{ asset('`+ response.imagePath +`') }}" class="avatar rounded-circle"/>
+																<div class="d-flex flex-column">
+																	<p class="p-0 m-0 fw-bold">`+ response.fullName +`</p>
+																	<div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+																		<p class="mb-1">
+																			`+ response.content +`
+																		</p>
+																		<p class="m-0" style="font-size: .6rem;">
+																			`+ response.createdAt +`
+																		</p>
+																	</div>
+																</div>
+															</div>`;
+										$('#project_comments h6').remove();
+										$('#project_comments').append(commentHtml);
+										Swal.fire({
+											position: 'center',
+											icon: 'success',
+											title: 'Comment has been Added',
+											confirmButtonText: 'OK',
+										})
+									}
+								});
+							}
+						})
+					}
+				})
+			})
+		</script>
+    {% endblock %}
+{% endblock %}

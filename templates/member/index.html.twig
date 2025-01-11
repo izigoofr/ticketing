@@ -1,0 +1,242 @@
+{% extends 'base.html.twig' %}
+{% block layout %}
+    <link rel="stylesheet" href="{{ asset('assets/css/quill.bubble.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/quill.snow.css') }}">
+	<div class="layout-wrapper layout-content-navbar layout-without-menu">
+		<div
+			class="layout-container">
+			<!-- Layout container -->
+			<div
+				class="layout-page">
+				<!-- Navbar -->
+				{{ include('components/navbar.html.twig') }}
+				<!-- / Navbar -->
+
+				<!-- Content wrapper -->
+					<div
+					class="content-wrapper"> <!-- Content -->
+
+					<div class="container-xxl flex-grow-1 container-p-y">
+						<h4 class="fw-bold py-3 mb-4">
+							<span class="text-muted fw-light">Member Space /
+							</span>
+							Projects
+						</h4>
+						{% if app.user.team is null %}
+							<h6 class="text-center text-warning">Your not in a team yet, contact the admin for more information !</h6>
+						{% else %}
+							<div class="card">
+								<h5 class="card-header"><span class="text-muted">Assigned projects</span> / <span>Team : <span class="text-info">{{ app.user.team.name }}</span></h5>
+								<div class="table-responsive text-nowrap">
+									<table class="table">
+										<thead class="table-light">
+											<tr>
+												<th>Project</th>
+												<th>Client</th>
+												<th>Team members</th>
+												<th>Status</th>
+												<th>Start date</th>
+												<th class="text-center">Actions</th>
+											</tr>
+										</thead>
+										<tbody class="table-border-bottom-0">
+											{% for project in project_list %}
+												<tr>
+													<td>
+														<strong>{{ project.title }}</strong>
+													</td>
+													<td>{{ project.client.firstName ~ ' ' ~ project.client.lastName }}</td>
+													<td>
+														<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+															{% for member in project.team.users %}
+																<li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="Lilian Fuller">
+																	<img src="{{ asset(member.imagePath != null ? member.imagePath : 'assets/img/avatars/no-avatar.png') }}" alt="Avatar" class="rounded-circle"/>
+																</li>
+															{% endfor %}
+														</ul>
+													</td>
+													<td>
+														<span class="badge
+														{% if project.status == 'Not Started Yet' %}
+															bg-label-dark
+														{% elseif project.status == 'Pending' %}
+															bg-label-info
+														{% elseif project.status == 'In Progress' %}
+															bg-label-primary
+														{% elseif project.status == 'Finished' %}
+															bg-label-success
+														{% endif %}
+														me-1">
+															{{ project.status }}
+														</span>
+													</td>
+
+													<td>{{ project.startDate }}</td>
+													<td class="text-center">
+														<button class="btn btn-sm btn-dark task_btn" {{ project.status == 'Not Started Yet' ? 'disabled' : '' }} data-id="{{ project.id }}">
+															<i class='bx bx-bar-chart-alt-2'></i>
+															Tasks
+														</button>
+														<button class="btn btn-sm btn-primary project_comments_btn" data-id="{{ project.id }}" >
+															<i class='bx bx-message-dots'></i>
+														</button>
+													</td>
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{% endif %}
+					</div>
+					<!--comment modal-->
+					<div class="modal fade" id="projectComment" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-fullscreen" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button
+                                  type="button"
+                                  class="btn-close"
+                                  data-bs-dismiss="modal"
+                                  aria-label="Close"
+                                ></button>
+                              </div>
+                              <div class="modal-body">
+                                <div class="col-12 shadow">
+									<div class="card h-100 p-comments-container" style="height: 80vh !important;">
+										<div class="card-header border-bottom">
+											<h5 class="m-0">Project comments</h5>
+										</div>
+										<div class="card-body py-2 content">
+											<div class="row g-2" id="project_comments">
+												
+											</div>
+										</div>
+										<form id="new_comment_form" class="card-footer border-top py-3">
+											<div class="row gx-0">
+												<div class="col-11">
+													<input type="text" id="commentContent" style=" border-top-right-radius: 0; border-bottom-right-radius: 0;" name="content" placeholder="Write your comment here" class="form-control"/>
+												</div>
+												<div class="col-1">
+													<button class="btn btn-primary" style=" border-top-left-radius: 0; border-bottom-left-radius: 0;">
+														send
+													</button>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+					<!-- / Content -->
+					<div class="content-backdrop fade"></div>
+				</div>
+				<!-- Content wrapper -->
+			</div>
+			<!-- / Layout page -->
+		</div>
+	</div>
+{% endblock %}
+{% block javascript %}
+    <script>
+        $(document).ready(function(){
+            $(document).on('click', '.task_btn', function(){
+                let id = $(this).data('id');
+                let url = "{{ path('member_project', {id: 'p_id'}) }}";
+                window.location.href = url.replace('p_id', id);
+            })
+			$(document).on('click', '.project_comments_btn', function(){
+				let id = $(this).data('id');
+				let url = "{{ path('project_comments', {id: 'p_id'}) }}";
+				$.ajax({
+					url: url.replace('p_id', id),
+					method: 'GET'
+				}).then((response) => {
+					$('#project_comments').text('');
+					for (let i = 0; i < response.length; i++) {
+						const comment = response[i];
+						const commentHtml = `<div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+												<img src="{{ asset('`+ comment.imagePath +`') }}" class="avatar rounded-circle"/>
+												<div class="d-flex flex-column">
+													<p class="p-0 m-0 fw-bold">`+ comment.fullName +`</p>
+													<div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+														<p class="mb-1">
+															`+ comment.content +`
+														</p>
+														<p class="m-0" style="font-size: .6rem;">
+															`+ comment.createdAt +`
+														</p>
+													</div>
+												</div>
+											</div>`;
+
+						$('#project_comments').append(commentHtml);
+					}
+					$('#new_comment_form').attr('data-id', id);
+					$('#projectComment').modal('show');
+				})
+			})
+			$('#new_comment_form').submit(function(event){
+                event.preventDefault();
+                let content = $('#commentContent');
+                let isValid = true;
+                if(content.val() === ''){
+                    isValid = false;
+                    content.toggleClass('error');
+                }else{
+                    content.removeClass('error');
+                }
+                if(isValid){
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'Confirmation',
+                    text: 'Are you sure you want to add this comment?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1E90FF',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Add',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if(result.isConfirmed){
+						let id = $(this).data('id');
+                        let url = "{{ path('new_project_comment', {id: 'p_id'}) }}";
+                        $.ajax({
+                            url: url.replace('p_id', id),
+                            method: 'POST',
+                            data: $(this).serialize()
+                        }).then((response) => {
+                            if (!jQuery.isEmptyObject(response)) {
+                                    $('#commentContent').val('');
+                                    const commentHtml = `<div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+                                                            <img src="{{ asset('`+ response.imagePath +`') }}" class="avatar rounded-circle"/>
+                                                            <div class="d-flex flex-column">
+                                                                <p class="p-0 m-0 fw-bold">`+ response.fullName +`</p>
+                                                                <div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+                                                                    <p class="mb-1">
+                                                                        `+ response.content +`
+                                                                    </p>
+                                                                    <p class="m-0" style="font-size: .6rem;">
+                                                                        `+ response.createdAt +`
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>`;
+                                    $('#project_comments').append(commentHtml);
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Comment has been Added',
+                                        confirmButtonText: 'OK',
+                                    })
+                                }
+                            });
+                        }
+                    })
+                }
+            })
+        })
+
+    </script>
+{% endblock %}

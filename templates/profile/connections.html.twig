@@ -1,0 +1,297 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% set facebook = links|filter(l => l.platform == 'facebook')  %}
+	{% set linkedin = links|filter(l => l.platform == 'linkedin')  %}
+	{% set github = links|filter(l => l.platform == 'github')  %}
+	{% set instagram = links|filter(l => l.platform == 'intagram')  %}
+	{% set twitter = links|filter(l => l.platform == 'twitter')  %}
+	<h4 class="fw-bold py-3 mb-4">
+		<span class="text-muted fw-light">Account Settings /
+		</span>
+		Connections
+	</h4>
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills flex-column flex-md-row mb-3">
+				<li class="nav-item">
+					<a class="nav-link" href="{{ path('profile') }}">
+						<i class="bx bx-user me-1"></i>
+						Account</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active" href="javascript:void(0);">
+						<i class="bx bx-link-alt me-1"></i>
+						Connections</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ path('profile_security') }}">
+						<i class="bx bx-lock me-1"></i>
+						Password</a>
+				</li>
+			</ul>
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+						<h5 class="card-header">Social Accounts</h5>
+						<div class="card-body">
+							<p>Display content from social accounts on your site</p>
+							<!-- Social Accounts -->
+							<div class="d-flex mb-3">
+								<div class="flex-shrink-0">
+									<img src="{{ asset('assets/img/icons/brands/facebook.png') }}" alt="facebook" class="me-3" height="30"/>
+								</div>
+								<div class="flex-grow-1 row">
+									<div class="col-8 col-sm-7 mb-sm-0 mb-2">
+										<h6 class="mb-0">Facebook</h6>
+										{% if facebook is not empty %}
+											<a href="{{ facebook[0].url }}" target="_blank">@Connected</a>
+										{% else %}
+											<small class="text-muted">Not Connected</small>
+										{% endif %}
+									</div>
+									<div class="col-4 col-sm-5 text-end">
+										{% if facebook is not empty %}
+											<button type="button" class="btn btn-icon btn-outline-danger unlink_btn" data-id="{{ facebook[0].id }}">
+												<i class="bx bx-trash-alt"></i>
+											</button>
+										{% else %}
+											<button type="button" class="btn btn-icon btn-outline-secondary link-btn" data-social="facebook">
+												<i class="bx bx-link-alt"></i>
+											</button>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="d-flex mb-3">
+								<div class="flex-shrink-0">
+									<img src="{{ asset('assets/img/icons/brands/twitter.png') }}" alt="twitter" class="me-3" height="30"/>
+								</div>
+								<div class="flex-grow-1 row">
+									<div class="col-8 col-sm-7 mb-sm-0 mb-2">
+										<h6 class="mb-0">Twitter</h6>
+										{% if twitter is not empty %}
+											<a href="{{ twitter[0].url }}" target="_blank">@Connected</a>
+										{% else %}
+											<small class="text-muted">Not Connected</small>
+										{% endif %}
+									</div>
+									<div class="col-4 col-sm-5 text-end">
+										{% if twitter is not empty %}
+											<button type="button" class="btn btn-icon btn-outline-danger unlink_btn" data-id="{{ twitter[0].id }}">
+												<i class="bx bx-trash-alt"></i>
+											</button>
+										{% else %}
+											<button type="button" class="btn btn-icon btn-outline-secondary link-btn" data-social="twitter">
+												<i class="bx bx-link-alt"></i>
+											</button>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="d-flex mb-3">
+								<div class="flex-shrink-0">
+									<img src="{{asset('assets/img/icons/brands/instagram.png')}}" alt="instagram" class="me-3" height="30"/>
+								</div>
+								<div class="flex-grow-1 row">
+									<div class="col-8 col-sm-7 mb-sm-0 mb-2">
+										<h6 class="mb-0">instagram</h6>
+										{% if instagram is not empty %}
+											<a href="{{ instagram[0].url }}" target="_blank">@Connected</a>
+										{% else %}
+											<small class="text-muted">Not Connected</small>
+										{% endif %}
+									</div>
+									<div class="col-4 col-sm-5 text-end">
+										{% if instagram is not empty %}
+											<button type="button" class="btn btn-icon btn-outline-danger unlink_btn" data-id="{{ instagram[0].id }}">
+												<i class="bx bx-trash-alt"></i>
+											</button>
+										{% else %}
+											<button type="button" class="btn btn-icon btn-outline-secondary link-btn" data-social="instagram">
+												<i class="bx bx-link-alt"></i>
+											</button>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="d-flex mb-3">
+								<div class="flex-shrink-0">
+									<img src="{{ asset('assets/img/icons/brands/github.png') }}" alt="dribbble" class="me-3" height="30"/>
+								</div>
+								<div class="flex-grow-1 row">
+									<div class="col-8 col-sm-7 mb-sm-0 mb-2">
+										<h6 class="mb-0">Github</h6>
+										{% if github is not empty %}
+											<a href="{{ github[0].url }}" target="_blank">@Connected</a>
+										{% else %}
+											<small class="text-muted">Not Connected</small>
+										{% endif %}
+									</div>
+									<div class="col-4 col-sm-5 text-end">
+										{% if github is not empty %}
+											<button type="button" class="btn btn-icon btn-outline-danger unlink_btn" data-id="{{ github[0].id }}">
+												<i class="bx bx-trash-alt"></i>
+											</button>
+										{% else %}
+											<button type="button" class="btn btn-icon btn-outline-secondary link-btn" data-social="github">
+												<i class="bx bx-link-alt"></i>
+											</button>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="d-flex">
+								<div class="flex-shrink-0">
+									<img src="{{ asset('assets/img/icons/brands/linkedin.png') }}" alt="behance" class="me-3" height="30"/>
+								</div>
+								<div class="flex-grow-1 row">
+									<div class="col-8 col-sm-7 mb-sm-0 mb-2">
+										<h6 class="mb-0">LinkedIn</h6>
+										{% if linkedin is not empty %}
+											<a href="{{ linkedin[0].url }}" target="_blank">@Connected</a>
+										{% else %}
+											<small class="text-muted">Not Connected</small>
+										{% endif %}
+									</div>
+									<div class="col-4 col-sm-5 text-end">
+										{% if linkedin is not empty %}
+											<button type="button" class="btn btn-icon btn-outline-danger unlink_btn" data-id="{{ linkedin[0].id }}">
+												<i class="bx bx-trash-alt"></i>
+											</button>
+										{% else %}
+											<button type="button" class="btn btn-icon btn-outline-secondary link-btn" data-social="linkedin">
+												<i class="bx bx-link-alt"></i>
+											</button>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<!-- /Social Accounts -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="link" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<form id="link_form">
+						<div class="modal-header">
+							<h5 class="modal-title" id="modalTitle"></h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								<div class="col mb-3">
+									<label for="url" class="form-label">Link</label>
+									<input type="text" id="platform" hidden name="platform">
+									<input type="text" id="url" name="url" class="form-control" placeholder="Facebook page URL"/>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+								Close
+							</button>
+							<button type="submit" class="btn btn-primary">Save</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	    {% block javascript %}
+		<!--add link-->
+		<script>
+			$(document).ready(function(){
+				$('#modalTitle').css('text-transform', 'capitalize');
+				$('.link-btn').click(function(){
+					$('#modalTitle').empty();
+					$('#url').val('');
+					$('#modalTitle').append('Link '+ $(this).data('social') +' Account');
+					$('#url').attr('placeholder', $(this).data('social') + ' page url');
+					$('#platform').val($(this).data('social'));
+					$('#link').modal('show');
+				})
+			})
+		</script>
+		<!--link form-->
+		<script>
+			$(document).ready(function(){
+				$('#link_form').submit(function(event) {
+					event.preventDefault();
+					let field = $('#url').val();
+					let isValide = true;
+					if(field === ''){
+						$('#url').toggleClass('error');
+						isValide = false;
+					}else{
+						$('#url').removeClass('error');
+					}
+					if(isValide){
+						let url = "{{ path('profile_connection_link') }}";
+						$.ajax({
+							url: url,
+							method: 'POST',
+							data: $(this).serialize()
+						}).then((response) => {
+							if(response == 'linked'){
+								Swal.fire({
+									icon: 'success',
+									title: 'Linked',
+									text: 'The page has been Linked',
+									confirmButtonColor: '#3085d6',
+									confirmButtonText: 'OK'
+								}).then(function(){
+									setTimeout(()=>{
+										window.location.reload();
+									});
+								});
+							}
+						})
+					}
+				})
+			})
+		</script>
+        <script>
+            $(document).ready(function () {
+            $('.unlink_btn').click(function () {
+                Swal.fire({
+                icon: 'warning',
+                title: 'Unlink Confirmation',
+                text: 'Are you sure you want to unlink this item?',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Unlink',
+                cancelButtonText: 'Cancel',
+                }).then((result) => {
+					if (result.isConfirmed) {
+						let id = $(this).data('id');
+						let url = "{{ path('profile_connection_unlink', {id: 'p_id'}) }}";
+						$.ajax({
+							url: url.replace('p_id', id),
+							method: 'POST'
+						}).then((response) => {
+							if(response == 'unlinked'){
+								Swal.fire({
+									icon: 'success',
+									title: 'Linked',
+									text: 'The page has been Linked',
+									confirmButtonColor: '#3085d6',
+									confirmButtonText: 'OK'
+								}).then(function(){
+									setTimeout(()=>{
+										window.location.reload();
+									});
+								});
+							}
+						})
+					}
+                });
+            })
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

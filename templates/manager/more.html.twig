@@ -1,0 +1,476 @@
+{% extends 'base.html.twig' %}
+{% block layout %}
+	<div class="layout-wrapper layout-content-navbar layout-without-menu">
+		<div
+			class="layout-container">
+			<!-- Layout container -->
+			<div class="layout-page">
+				<!-- Navbar -->
+                {{ include('components/navbar.html.twig') }}
+				<!-- / Navbar -->
+
+				<!-- Content wrapper -->
+					<div
+					class="content-wrapper"> <!-- Content -->
+
+					<div class="container-xxl flex-grow-1 container-p-y">
+                        <a href="{{ path('manager') }}" class="btn btn-secondary">Back</a>
+						<h4 class="fw-bold py-3 mb-4">
+							<span class="text-muted fw-light">Project Details /
+							</span>
+							{{ project.title }}
+						</h4>
+						<div class="row gy-4">
+							<div class="col-12 col-md-6 col-xl-8">
+								<div class="card mb-4 h-100">
+									<h5 class="card-header">{{ project.title }}</h5>
+									<div class="table-responsive text-nowarp">
+										<table class="table">
+											<tbody class="table-border-bottom-0">
+												<tr class="border-top">
+													<td>
+														<span class="fw-bold">Manager :
+														</span>
+														{{project.user.firstName ~ ' ' ~ project.user.lastName}}
+													</td>
+													<td>
+														<span class="fw-bold">Team :</span>
+														{{ project.team.name }}
+                                                    </td>
+												</tr>
+												<tr>
+													<td>
+														<span class="fw-bold">Start date :
+														</span>
+														<span class="text-info">{{ project.startDate }}</span>
+													</td>
+													<td>
+														<span class="fw-bold">DeadLine :
+														</span>
+														<span class="text-warning">{{ project.deadLine }}</span>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<span class="fw-bold">
+															Client :
+														</span>
+														<span>{{ project.client.firstName ~ ' ' ~ project.client.lastName}}</span>
+													</td>
+													<td>
+														<span class="fw-bold">
+															Status :
+														</span>
+														<span class="badge
+                                                            {% if project.status == 'Not Started Yet' %}
+                                                                bg-label-dark
+                                                            {% elseif project.status == 'Pending' %}
+                                                                bg-label-info
+                                                            {% elseif project.status == 'In Progress' %}
+                                                                bg-label-primary
+                                                            {% elseif project.status == 'Finished' %}
+                                                                bg-label-success
+                                                            {% endif %}
+                                                            me-1">{{project.status}}</span>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-md-6 col-xl-4">
+								<div class="card px-0">
+									<h5 class="card-header">
+										Team :
+										<span class="text-info">{{ project.team.name }}</span>
+									</h5>
+									<div class="card-body px-0 pb-0 w-100">
+										<table class="table table-border-bottom-0 text-center">
+											<thead>
+												<tr>
+													<th>#</th>
+													<th>Full Name</th>
+													<th>Project Tasks</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for member in project.team.users %}
+                                                    <tr>
+                                                        <td>
+                                                            <img src="{{ asset(member.imagePath != null ? member.imagePath : 'assets/img/avatars/no-avatar.png') }}" alt="" class="avatar"/>
+                                                        </td>
+                                                        <td>{{ member.firstName ~ ' ' ~ member.lastName }}</td>
+                                                        <td>
+                                                            <span class="text-success">{{ member.tasks|filter(t => t.project == project)|length }}</span>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="col-12">
+								<div class="card comments-container" style="max-height: 350px">
+									<div class="card-header border-bottom">
+										<h5 class="m-0">Project comments</h5>
+									</div>
+									<div class="card-body py-2 content">
+										<div class="row g-2" id="project_comments">
+											{% if project.comments is not empty %}
+                                                {% for comment in project.comments %}
+                                                    <div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+                                                        <img src="{{ asset(comment.user.imagePath != null ? comment.user.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar rounded-circle"/>
+                                                        <div class="d-flex flex-column">
+                                                            <p class="p-0 m-0 fw-bold">{{ comment.user.firstName ~ ' ' ~ comment.user.lastName }}</p>
+                                                            <div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+                                                                <p class="mb-1">
+                                                                   {{ comment.content }}
+                                                                </p>
+                                                                <p class="m-0" style="font-size: .6rem;">{{ comment.createdAt|date('Y-m-d H:m:s') }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <h6 class="text-center lead pt-3">No comments yet</h6>
+                                            {% endif %}
+										</div>
+									</div>
+									<div class="card-footer border-top py-3">
+										<button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#new_comment_modal">
+											add new comment
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 mb-4">
+								<div class="card">
+									<div class="card-header d-flex justify-content-between align-items-center">
+										<span>Project Tasks</span>
+										<button class="btn btn-sm btn-primary" {{ project.status == 'Finished' ? 'disabled' : '' }} data-bs-target="#new_task_modal" data-bs-toggle="modal">
+											Add new Task
+										</button>
+									</div>
+									<div class="card-body task-container pt-3">
+										{% if project.tasks is not empty %}
+                                            {% for task in project.tasks %}
+                                                <div class="card task shadow" id="{{ task.id }}">
+                                                    <h6 class="card-header pb-2 fw-bold">{{ task.title }}</h6>
+                                                    <div class="card-body pb-1" style="font-size: 0.8rem">
+                                                        <p class="my-0">
+                                                            {{ task.description|slice(0, 170) }} {{ task.description|length > 170 ? '...' : '' }}
+                                                        </p>
+                                                        <span class="fw-bold">Asigned Member :
+                                                            <span class="lead" style="font-size: 0.8rem">{{ task.user.firstName ~ ' ' ~ task.user.lastName }}</span>
+                                                        </span><br/>
+                                                        <span class="fw-bold">Status :
+                                                            <span class="badge
+                                                            {% if task.status == 'Not Started Yet' %}
+                                                                bg-label-dark
+                                                            {% elseif task.status == 'Pending' %}
+                                                                bg-label-info
+                                                            {% elseif task.status == 'In Progress' %}
+                                                                bg-label-primary
+                                                            {% elseif task.status == 'Finished' %}
+                                                                bg-label-success
+                                                            {% endif %}
+                                                            me-1">{{task.status}}</span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="card-footer pt-2 pb-3">
+                                                        <button class="btn btn-dark btn-sm task_details_btn" data-id="{{ task.id }}">
+                                                            see details
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm task_delete_btn" data-id="{{ task.id }}">
+                                                            delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <h6 class="text-center lead pt-3">Not task defined yet</h6>
+                                        {% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--new comment modal-->
+						<form id="new_comment_form">
+                            <div class="modal fade" id="new_comment_modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Add new Comment</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body py-1">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <textarea name="content" id="projectCommentContent" class="form-control" cols="30" rows="5" placeholder="write your comment here.."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer pb-2">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+						<!--new task modal-->
+						<form id="new_task_form" data-id="{{ project.id }}">
+                            <div class="modal fade" id="new_task_modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                Fill task informations
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body py-1 pt-3">
+                                            <div class="row gy-2">
+                                                <div class="col-8">
+                                                    <label for="" class="form-label fw-bold">
+                                                        Member
+                                                    </label>
+                                                    <select name="user_id" id="user_id" class="form-select">
+                                                        <option value="">Choose a team member</option>
+                                                        {% for member in project.team.users|filter(u => u.id != app.user.id and u.roles[0] != 'ROLE_ADMIN' and u.roles[0] != 'ROLE_MANAGER') %}
+                                                            <option value="{{ member.id }}">{{ member.firstName ~ ' ' ~ member.lastName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                 <div class="col-4">
+                                                    <label for="" class="form-label fw-bold">
+                                                        Number of days
+                                                    </label>
+                                                    <select name="days" id="days" class="form-select">
+                                                        <option value="">number od days</option>
+                                                        {% for i in 1..30 %}
+                                                            <option value="{{ i }}">{{ i }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="" class="form-label fw-bold">
+                                                        Title
+                                                    </label>
+                                                    <input type="text" name="title" id="title" class="form-control" placeholder="Task title">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="" class="form-label fw-bold">
+                                                        Task details
+                                                    </label>
+                                                    <textarea name="description" id="description" class="form-control" cols="30" rows="5" placeholder="Task description.."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer pb-2">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+					</div>
+					<!-- / Content -->
+
+					<div class="content-backdrop fade"></div>
+				</div>
+				<!-- Content wrapper -->
+			</div>
+			<!-- / Layout page -->
+		</div>
+	</div>
+{% endblock %}
+{% block javascript %}
+    <script>
+      $(document).ready(function () {
+            $("#new_task_form").submit(function (event) {
+                event.preventDefault();
+                console.log('hey');
+                // Data validation
+                let memberSelect = $("#user_id");
+                let titleInput = $("#title");
+                let daysSelect = $("#days");
+                let descriptionTextarea = $("#description");
+
+
+                let isValid = true;
+
+                if (memberSelect.val() === "") {
+                    memberSelect.addClass("error");
+                    isValid = false;
+                } else {
+                    memberSelect.removeClass("error");
+                }
+
+                if (titleInput.val() === "") {
+                    titleInput.addClass("error");
+                    isValid = false;
+                } else {
+                    titleInput.removeClass("error");
+                }
+
+                if (daysSelect.val() === "") {
+                    daysSelect.addClass("error");
+                    isValid = false;
+                } else {
+                    daysSelect.removeClass("error");
+                }
+
+                if (descriptionTextarea.val() === "") {
+                    descriptionTextarea.addClass("error");
+                    isValid = false;
+                } else {
+                    descriptionTextarea.removeClass("error");
+                }
+
+                if (isValid) {
+                    let url = "{{ path('create_task', {id: 'p_id'}) }}";
+                    let id = $(this).data('id');
+                    // AJAX request
+                    $.ajax({
+                        url: url.replace('p_id', id),
+                        method: 'POST',
+                        data: $(this).serialize()
+                    }).then((response) => {
+                        if (response === "created") {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Task created successfully',
+                                confirmButtonText: 'OK',
+                                timer: 2000
+                            })
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+                }
+            });
+
+            $('#new_comment_form').submit(function(event){
+                event.preventDefault();
+                let content = $('#projectCommentContent');
+                let isValid = true;
+                if(content.val() === ''){
+                    isValid = false;
+                    content.toggleClass('error');
+                }else{
+                    content.removeClass('error');
+                }
+                if(isValid){
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'Confirmation',
+                    text: 'Are you sure you want to add this comment?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1E90FF',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Add',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        let url = "{{ path('new_project_comment', {id: project.id}) }}";
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: $(this).serialize()
+                        }).then((response) => {
+                            if (!jQuery.isEmptyObject(response)) {
+                                    $('#new_comment_modal').modal('hide');
+                                    $('#projectCommentContent').val('');
+                                    const commentHtml = `<div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+                                                            <img src="{{ asset('`+ response.imagePath +`') }}" class="avatar rounded-circle"/>
+                                                            <div class="d-flex flex-column">
+                                                                <p class="p-0 m-0 fw-bold">`+ response.fullName +`</p>
+                                                                <div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+                                                                    <p class="mb-1">
+                                                                        `+ response.content +`
+                                                                    </p>
+                                                                    <p class="m-0" style="font-size: .6rem;">
+                                                                        `+ response.createdAt +`
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>`;
+                                    $('#project_comments h6').remove();
+                                    $('#project_comments').append(commentHtml);
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Comment has been Added',
+                                        confirmButtonText: 'OK',
+                                    })
+                                }
+                            });
+                        }
+                    })
+                }
+            })
+
+            $('.task_details_btn').on('click', function(){
+                let id = $(this).data('id');
+                let url = "{{ path('get_task', {id: project.id, task_id: 'p_task_id'}) }}";
+                window.location.href = url.replace('p_task_id', id);
+            })
+
+            $('.task_delete_btn').on('click', function(){
+                 Swal.fire({
+                    icon: 'warning',
+                    title: 'Confirmation',
+                    text: 'Are you sure you want to delete this task?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF0000',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        let id = $(this).data('id');
+                        let url = "{{ path('delete_task', {id: 'p_id'}) }}";
+                        $.ajax({
+                            url: url.replace('p_id', id),
+                            method: 'POST',
+                        }).then((response) => {
+                            if(response == 'deleted'){
+                                $('#'+id).remove();
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Task has been deleted',
+                                    confirmButtonText: 'OK',
+                                })
+                            }
+                        }).fail(function(){
+                            
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'This task is a dependent task !',
+                                confirmButtonText: 'OK',
+                            })
+                        })
+                        }
+                    })
+            })
+      });
+    </script>
+{% endblock %}

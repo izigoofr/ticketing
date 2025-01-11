@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sandbox{% endblock %}
+
+{% block content %}
+    <h1>Sandbox</h1>
+    <a class="btn btn-info" href="{{ path('app_sandbox_index') }}">back to list</a>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ sandbox.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ sandbox.title }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ sandbox.content|raw }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ sandbox.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Comments:</h2>
+    <ul>
+        {% for comment in sandbox.comments %}
+            <li>{{ comment.content|raw }}</li>
+        {% else %}
+            <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+
+
+
+
+
+    <h2>Ajouter un commentaire :</h2>
+    {{ form_start(commentForm) }}
+    {{ form_row(commentForm.content) }}
+    <button class="btn btn-success" type="submit">Envoyer</button>
+    {{ form_end(commentForm) }}
+{% endblock %}

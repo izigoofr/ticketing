@@ -1,0 +1,448 @@
+--------------------------------------------------------------------------
+basic of passing arguments or data to views using the Route::.. methods
+--------------------------------------------------------------------------
+Route::get('/', function () {
+    return view('welcome', /*array of argument passing to the view*/);
+});
+--------------------------------------------------------------------------
+output variable in BLADE template ?
+double brackets :
+{{$var}} => <?php echo $var ?> or <?= $var ?>
+also there is derective that we can use in 
+loop or conditional or all type of stuff
+
+ForEach derective : 
+@foreach($array as $elm)
+@endforeach
+
+Php derctive :
+@php
+@endphp
+
+conditional derective :
+-if derective
+@if(condition)
+@endif
+-unless derective
+@unless(condition)
+@else
+@endunless
+
+-----------------------------------------------------------------------------
+Data come usualy through a model
+Eloquent is an object relational mapper (ORM) that is included by default within the Laravel framework.
+An ORM is software that facilates handling database records by representing data
+as objects, working as a layer of abstraction on top of the database engine used to
+store an application's data.
+
+
+
+TODO ---> 
+-->Creating A Basic Listings Modal
+-->Creating the root for All Lisings and Single Listing
+-------------------------------------------------------------------------------
+DataBase Floder
+-------------------------------------------------------------------------------
+seting the dataBase Config in --env-- file
+we don't have to create tables or columns because in laravel we have something
+called --Migrations[file we can run to do all stuff]-- 
+in the Migration floder we define the files that will be compiled by artisan
+commande to create tables for us.
+how to create migration file with artisan commande ?
+php artisan make:migration create_listings_table
+how to run a migration file ?
+php artisan migrate
+-------------------------------------------------------------------------------
+seeding data and factories [floders]
+-------------------------------------------------------------------------------
+DataBase seeder, if we run the run() function {
+	User::factory(10)->create() will create 10 dummy users
+}
+why ?
+in the UserFacory.php
+the definition() function use somthings called faker to create names, 
+emails ...
+how to run the seeder file ? 
+php artisan db:seed
+how to refresh data in tables ?
+php artisan migrate:refresh
+*******************************************************************************
+how to add static date in our seeder file
+*******************************************************************************
+go to the dataBaseSeeder.php in the run function :
+[Model[Class Name]]::create([
+	/*data*/
+])
+create() is a method that allow us to insert data into dataBase
+also there is [update(), delete()]
+*******************************************************************************
+using factory
+*******************************************************************************
+creating a factory : 
+php artisan make:factory [nameFactory]
+
+*******************************************************************************
+-------------------------------------------------------------------------------
+Creating Model == [using elequant functionality]
+example of a factory : 
+public function definition()
+{
+    return [
+            'title' => $this->faker->sentence(),
+            'tags' => 'laravel, api, backend',
+            'company' => $this->faker->company(),
+            'email' => $this->faker->companyEmail(),
+            'website' => $this->faker->url(),
+            'location' => $this->faker->city(),
+            'description' => $this->faker->paragraph(5)
+        ];
+    }
+to run it : 
+[model]::factory(number of rows)->create()
+-------------------------------------------------------------------------------
+php artisan make:model [model name]
+! for the most of the time we don't have to do much to the model, expect when
+we need to add relationships and stuff
+-------------------------------------------------------------------------------
+Layout and sections
+-------------------------------------------------------------------------------
+layout.blade.php file
+contain the stuff that will be existe in every view in our project
+render a place for view in the layout ?
+by using @yield('name') directive
+how to extends a layout ?
+by using @extends('layout') directive
+and to access to the rendred place we need to wrapp our contents in a section
+by using @section('name[used in the yield directive]') directive
+------------------------------------------------------------------------------
+partials floder
+------------------------------------------------------------------------------
+have the components of the project
+how to add a components to a .blade file ?
+by using : include('file')
+------------------------------------------------------------------------------
+Route Model Binding
+-----------------------------------------------------------------------------------
+testing if data found before redirect to the view, so if we use something
+called route model binding we can prevent that, insteed of passing an id to
+get an element we can pass the hole model in the route.[automaticly get the element
+by it's id]
+-----------------------------------------------------------------------------------
+abord('404') :: not found page
+-----------------------------------------------------------------------------------
+Blade Components
+-----------------------------------------------------------------------------------
+[showing data]
+Blade components are a subset of blade template that allow you to create new custom, reusable, 
+encapsulated PHP and HTML. For example you may want to create a navbar to be used in many of your application pages.
+So you build your navbar as a component and can reused the component wherever you want.
+to access to a component we need to add the directive @props('[props-name]')
+and we call the component with : 
+<x-component-name :variable-used-in-the-component = "$data" />
+--> adding a component inside of component
+[style]
+<div>
+{{$slot}}
+</di>
+and we put the second component inside of it like this : 
+<x-component-name>
+	<x-component-name :variable-used-in-the-component = "$data" />
+</x>
+-----------------------------------------------------------------------------------
+Blade Components attributs
+-----------------------------------------------------------------------------------
+how to add attribute to a component
+we need to add {{$attributes->merge(['class' => 'defaulth classe'])}}
+and we can add more class when we call the component in diffrent views
+-----------------------------------------------------------------------------------
+controllers
+-----------------------------------------------------------------------------------
+ressources need a controllers
+how to create a controller ?
+php artisan make:controller ListingController
+the controller have a methods inside of it
+public function index(){
+//show all data
+}
+public function show($id //or $whole model){
+//show a single data
+}
+using controller with route
+Route::get('/', [Controller::class, /*function*/]);
+
+
+
+||||||From Here ||||||
+
+
+
+-----------------------------------------------------------------------------------
+Common Ressource Routes and method naming
+-----------------------------------------------------------------------------------
+index   - show all data
+show    - show single data
+create  - show form to create new data
+edit    - show form ro edit listing
+store   - store a new data
+update  - update data
+destroy - delete data
+-----------------------------------------------------------------------------------
+scope filter
+-----------------------------------------------------------------------------------
+using the request() function [the same result as defining a parametre of type Request]
+the scope filter : 
+in the model we create a function : 
+public function scopeFilter($query, array $filters){
+
+}
+and instead of using ::all() in the controller we use
+::latest()->filter(request(['tags']))->get()
+The filter query parameters can be used to add where clauses to your Eloquent query
+inside the scopeFilter(...) function we use the $query variable to make our
+query : 
+$query->where('tags', 'like', '%' . request('filterOption') . '%')
+general expression : 
+public function scopeFilter($query, array $filters){
+    if($filters['column'] ?? false){
+        $query->where('column in db', 'option', data)
+	->orWhere(...);
+    }
+}
+-----------------------------------------------------------------------------------
+clockwork extension
+-----------------------------------------------------------------------------------
+-->download the extension in your browser
+-->install it to the project : 
+#composer require itsgoingd/clockwork
+for seeing : performance, Models, Database, views, timeline...
+***********************************************************************************
+when we use post method we need to use @csrf directive
+prevent cross-site scripting attacks, stop people from beign able
+to have a form on their website to submit to your endpoint
+***********************************************************************************
+validation and store data
+-----------------------------------------------------------------------------------
+$request->all() contain all the paramettre passed with the method post
+-------------------
+validation passed : 
+-------------------
+create a variable of type $request->validate(..); then we set our validation
+requirement
+example : 
+$formFields = $request->validate([
+	'title' => 'required',
+	'company' => ['required', Rulle::unique('listings', 'company')]
+	.
+	.
+	.
+]);
+when we have an error of validation, it sended to the view, we can access to the 
+error by using :
+@error('attribute')
+@enderror
+-------------------
+how to store data ? 
+-------------------
+to add data into a database, they've been put into a fillable property in the model
+because by default laravel don't allow mass assignemt
+protected $fillable = ['
+	'title', 
+	'company',
+	.
+	.
+	.
+'];
+or too simply allow mass assignemt by going to 
+AppServiceProvider.php --> and write :
+Model::ungard(); in the boot() function
+
+to store data we use the create method and pass the $formFields variable
+[contain all the paramettre passed in the request and need to be stored in the db]
+Listing::create($formFields)
+and then use redirect('/') to redirect the user to another URL.
+-----------------------------------------------------------------------------------
+flash messages
+-----------------------------------------------------------------------------------
+it stored at memory for one page load
+fisrt way :
+Session::flash('message','..message..');
+seconde way :
+in the redirect function : 
+redirect('/')->with('message','..message..');
+-----------------------------------------------------------------------------------
+now we need to show the message [ creating a component]
+in the -flash- component : 
+@if(session()->has('message'))
+/*code*/
+@endif
+-----------------------------------------------------------------------------------
+Alpline.js /*for message remover*/
+-----------------------------------------------------------------------------------
+very minimal framework,for having some interactive functionnlity
+but you don't want to reach for a full framework like --react--
+link : <script src="//unpkg.com/alpinejs" defer></script>
+in the message div we add these attributes : 
+x-data="{show: true}" 
+x-init="setTimeout(() => show = false, 3000)" 
+x-show = show
+-----------------------------------------------------------------------------------
+keeping the old data
+-----------------------------------------------------------------------------------
+using the old helper
+value="{{old('name')}}"
+-----------------------------------------------------------------------------------
+Pagination
+-----------------------------------------------------------------------------------
+you will not fetch all the data in single page so we need to use pagination
+so in the controller,
+instead of using ->get(), we will use ->paginate()
+and to show a numbred list of pagination : {{$arrayOfData->links()}}
+or simple paginate by using ->simplePaginate()
+laravel use tailwind by default so if we want to restyle de pagination we need
+fisrt to publish pagination package by : 
+#php artisan vendor:publish
+and then we need to go to the AppServiceProvider.php and use in boot() function : 
+#Paginator::useBootstrapFive();
+-----------------------------------------------------------------------------------
+File Upload
+-----------------------------------------------------------------------------------
+fisrt we need to use enctype="multipart/form-data" in the <form ...>
+check if there is a file in the request : 
+if($request->hasFile('name')){
+	$formFields['logo'] = $request->file('logo')->store('logos', 'public');
+	/*store() method to store the file in the /storage floder*/
+	/*'logos' => the floder where the file should be stored*/
+	/*by deafult it use 'local', files stored in << storage/app >>
+	  to change it we need to go to the config/filesystems.php
+	  'local' => 'public' in default [data will be stored in <<storage/app/public>>] 
+	*/
+}
+to access to the image, we need to create a sim-link from the storage/public/ 
+floder to the /public floder, and in order to do that we can use the php artisan
+commande : 
+#php artisan storage:link
+-----------------------------------------------------------------------------------
+Updating DATA
+-----------------------------------------------------------------------------------
+http "PUT" request: 
+in html form we have only "GET" and "POST"
+laravel give us very handy directive called method : 
+@method('PUT')
+update and delete which requires the method submitted to the server url to 
+be either PUT / PATCH (to modify the resource) and DELETE (for deleting the resource). 
+This is how the standard calls look like in Laravel CRUD application.
+--> return back() //to return to the previous page
+-----------------------------------------------------------------------------------
+Deleting DATA
+-----------------------------------------------------------------------------------
+using the directive @method('DELETE')
+-----------------------------------------------------------------------------------
+we need to store the password hashed, and in order to do that we should use : 
+bcrypt() method
+Bcrypt turns a simple password into fixed-length characters called a hash. 
+Before hashing a password, bcrypt applies a salt , a unique random string 
+that makes the hash unpredictable.
+if we want automaticly logging the user after creating an account we need to :
+store the created user in a variable and then use the auth() method ex: 
+
+$user = User::create($formFields);
+auth()->login($user);
+
+-----------------------------------------------------------------------------------
+auth links [the auth helper]
+-----------------------------------------------------------------------------------
+Laravel includes built-in authentication and session services which are typically accessed via the 
+Auth and Session facades. These features provide cookie-based authentication for requests that are 
+initiated from web browsers.
+to access to the user attributes we use : 
+auth()->user->attribute
+to show something just for logged users we use the @auth directive like this : 
+@auth
+@else
+@endauth
+-----------------------------------------------------------------------------------
+user logout
+-----------------------------------------------------------------------------------
+constroller function : 
+
+public function(Request $request){
+	
+}
+
+use : auth()->logout(); // remove user authentication from user session
+and it's recommended to --invalidate-- the user session and regenerate
+their csrf tokken : $request->invalidate
+
+-----------------------------------------------------------------------------------
+methods
+-----------------------------------------------------------------------------------
+GET : show data
+POST : store data / logout
+PUT : update data
+DELETE : delete data
+we use PUT and DELETE by the help of @method(..) directive
+-----------------------------------------------------------------------------------
+Login
+-----------------------------------------------------------------------------------
+we need to attempt to login the user in : 
+if(auth()->attempt($formFields)){
+	$request->session()->regenerate()  //generate the session()
+}
+if the attempt faild we use : back()->withErrors(['email' => 'Login or Password is Incorrect'])->onlyInput('email')
+to go back with the old input value
+
+-----------------------------------------------------------------------------------
+Guest and auth middleware
+-----------------------------------------------------------------------------------
+defined in the app/middleware floder
+Laravel Middleware acts as a bridge between a request and a reaction. 
+It is a type of sifting component. Laravel incorporates a middleware that confirms whether or not 
+the client of the application is verified. If the client is confirmed,
+it diverts to the home page otherwise, it diverts to the login page.
+to use it we go to the root and then we add : ->middleware('auth') to make this route only valide
+for athenticated users
+and there is ->middleware('guest') for unauthenticated users //in this option, by default it 
+redirect us to this endpoint : /home and in order to change it we need to go to the 
+RouteServiceProvider.php and change the value of HOME variable to our home page 
+-------------------------------------------------------------------------------------------------
+Relationships
+-------------------------------------------------------------------------------------------------
+handling the dataBase
+---------------------
+-->create foreign id : 
+	$table->foreignId('name_id')->contrained()->onDelete('cascade')
+-->creating relation ship in elequant model : (ex : this projet)
+	one listing --belgon to one user--
+	we need to create a function user() in the listing model and the same thing in the user
+	model
+	
+	public function user(){
+		return $this->belongsTo(User::class, 'user_id')
+	}
+
+	public function Listings(){
+		return $this->hasMany(Listing::class, 'user_id')
+	}
+
+ex : 
+to get all listings of a user : 
+User::find(1)->listings()->get();
+/*user()*/
+ 
+-------------------------------------------------------------------------------------------------
+Tinker
+-------------------------------------------------------------------------------------------------
+commande line tool than we can use to work with models, write queries...
+to access to it : #php artisan tinker
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+

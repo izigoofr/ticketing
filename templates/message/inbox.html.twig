@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	<h4 class="fw-bold py-3 mb-4">Your Inbox</h4>
+	<div class="row d-flex justify-content-center">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body px-1 col-12 d-flex gap-2 py-3 people-list px-2">
+					{% for member in member_list %}
+						<div data-id="{{ member.id }}" style="width: ;"  class="user-account d-flex align-items-center gap-2 rounded-3 p-2 shadow {{ recipent.id == member.id ? 'active' : '' }}">
+							<img src="{{ asset(member.imagePath != null ? member.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar"  style="object-fit: cover;" alt=""/>
+							<div class="info">
+								<h6 class="fw-bold my-0">{{ member.firstName ~ ' ' ~ member.lastName }}</h6>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="col-12 my-4">
+			<div class="card p-4">
+				<div class="card-body message-container">
+					<div class="row gy-3" id="chat_messages">
+						{% if inbox is not empty %}
+							{% for message in inbox %}
+								<div class="col-12">
+									<div class="d-flex shadow-sm gap-2 py-2 px-3">
+										<div class="d-block" style="width: max-content">
+											<img src="{{ asset(message.sender.imagePath != null ? message.sender.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar"/>
+										</div>
+										<div class="d-flex flex-column">
+											<p class="p-0 m-0 fw-bold">{{ message.sender.firstName ~ ' ' ~ message.sender.lastName}}
+												<span class="text-info">{{message.sender.id == app.user.id ? '(you)' : ''}}</span>
+											</p>
+											<div style="font-size: 0.8rem; line-height: 1.1;" class="lead">
+												<p>
+													{{ message.content }}
+												</p>
+												<p style="font-size: 0.6rem; line-height: 0.1">
+													{{ message.createdAt|date('Y-m-d H:m:s') }}
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						{% else %}
+							<div class="col text-center">
+								<h6 class="lead">This Inbox is empty</h6>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+				<form id="send_message_form" data-id="{{recipent.id}}" class="card-footer">
+					<div class="row gx-2 align-items-center">
+						<div class="col-lg-11 col-sm-10 col-9">
+							<input type="text" class="form-control" name="content" id="content" placeholder="write your message here..." autocomplete="off">
+						</div>
+						<div class="col-1">
+							<button class="btn btn-success">
+								<i class='bx bx-paper-plane'></i>
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+    {% block javascript %}
+        <script>
+            //set active page
+            $('#inbox').toggleClass('active');
+        </script>
+        <script>
+            $(document).ready(function (){
+                $('.user-account').on('click', function(){
+                    let url = "{{ path('inbox', {recipent_id: 'p_recipent_id'}) }}";
+                    window.location.href = url.replace('p_recipent_id', $(this).data('id'));
+                })
+            })
+        </script>
+        <!--send message-->
+        <script>
+            $(document).ready(function (){
+                $('#send_message_form').submit(function(event){
+                    event.preventDefault();
+                    let content = $('#content').val();
+                    if(content){
+                        let recipent_id = $(this).data('id');
+                        let url = "{{ path('send_message', {recipent_id: 'p_recipent_id'}) }}";
+                        $.ajax({
+                            url: url.replace('p_recipent_id', recipent_id),
+                            method: 'POST',
+                            data: $(this).serialize()
+                        }).then((response) => {
+                            if (!jQuery.isEmptyObject(response)) {
+						const message = `
+							<div class="col-12">
+								<div class="d-flex shadow-sm gap-2 py-2 px-3">
+									<div class="d-block" style="width: max-content">
+										<img src="{{ asset('${response.image}') }}" class="avatar"/>
+									</div>
+									<div class="d-flex flex-column">
+										<p class="p-0 m-0 fw-bold">
+											${response.full_name}
+										</p>
+										<div style="font-size: 0.8rem; line-height: 1.1;" class="lead">
+											<p>${response.content}</p>
+											<p style="font-size: 0.6rem; line-height: 0.1">${response.createdAt}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							`;
+								$('#chat_messages h6').remove();
+								$('#chat_messages').append(message);
+
+								
+
+								Swal.fire({
+									position: 'center',
+									icon: 'success',
+									title: 'Message sent successfully',
+									confirmButtonText: 'OK',
+								});
+							}
+
+                        })
+                    }
+                    else{
+                        alert('cannot send empty message')
+                    }
+                })
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

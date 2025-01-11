@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sandbox index{% endblock %}
+
+{% block content %}
+    <h1>Sandbox</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Tagged Users</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sandbox in sandboxes %}
+            <tr>
+                <td>{{ sandbox.id }}</td>
+                <td>{{ sandbox.title }}</td>
+                <td>{{ sandbox.content|raw }}</td>
+                <td>
+                    {% if sandbox.taggedUsers|length > 0 %}
+                        <ul>
+                            {% for user in sandbox.taggedUsers %}
+                                <li>{{ user.firstname }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        No tagged users
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="{{ path('app_sandbox_show', {'id': sandbox.id}) }}">Show</a>
+                    <a class="btn btn-warning btn-sm" href="{{ path('app_sandbox_edit', {'id': sandbox.id}) }}">Edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <a class="btn btn-primary" href="{{ path('app_sandbox_new') }}">Create new</a>
+{% endblock %}

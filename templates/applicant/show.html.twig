@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Project{% endblock %}
+
+{% block content %}
+    <h1>Request - Ticketing</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ project.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ project.title }}</td>
+            </tr>
+            <tr>
+                <th>Start_date</th>
+                <td>{{ project.startDate }}</td>
+            </tr>
+            <tr>
+                <th>Dead_line</th>
+                <td>{{ project.deadLine }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ project.status }}</td>
+            </tr>
+            <tr>
+                <th>Priority</th>
+                <td>{{ project.priority }}</td>
+            </tr>
+            <tr>
+                <th>Applicant</th>
+                <td>{{ project.applicant }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ project.type }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ project.content }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-info mt-3" href="{{ path('applicant') }}">back to list</a>
+
+    <a class="btn btn-warning mt-3" href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Project{% endblock %}
+
+{% block content %}
+    <h1>Create new Request - Ticketing</h1>
+
+
+    {{ include('applicant/_form.html.twig') }}
+
+    <a class="btn btn-info mt-3" href="{{ path('applicant') }}">back to list</a>
+
+
+
+
+
+{% endblock %}

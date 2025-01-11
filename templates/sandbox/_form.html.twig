@@ -1,0 +1,53 @@
+
+<style>
+    .form-check-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px; /* Espace entre les cases */
+        margin-top: 10px;
+    }
+
+    .form-check-input {
+        margin-right: 8px;
+    }
+
+    .form-check-label {
+        margin-bottom: 0; /* Supprime l'espace sous les étiquettes */
+    }
+
+</style>
+
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+
+<div class="mt-3">
+    {{ form_label(form.title) }}
+    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.title) }}
+</div>
+            <div class="mt-3" id="editor">
+                {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+            </div>
+<div class="mt-3">
+    <label for="taggedUsers" class="form-label fw-bold">Tagged Users</label>
+    <div class="form-check-group">
+        {% for choice in form.taggedUsers %}
+            <div class="form-check">
+                {{ form_widget(choice, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(choice, null, {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<button class="btn btn-primary mt-3">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}
+
+
+
+
+
+
+
