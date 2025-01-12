@@ -69,7 +69,7 @@ class SandboxController extends AbstractController
 
             // Création de l'email
             $email = (new Email())
-                ->from(new Address('contact@app-dev.fr', 'Florajet'))
+                ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
                 ->to($user->getEmail()) // Email de l'utilisateur qui crée la sandbox
                 ->bcc(...array_map(fn($user) => $user->getEmail(), $taggedUsers->toArray())) // Utilisateurs taggés en BCC
                 ->subject('Création d\'une sandbox')
