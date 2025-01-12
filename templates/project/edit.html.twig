@@ -14,9 +14,13 @@
 						<label for="title" class="form-label">Project title</label>
 						<input type="text" class="form-control" placeholder="Enter project name" value="{{ project.title }}" name="title" id="title">
 					</div>
+                    <div class="col-12">
+                        <label for="title" class="form-label">Project content</label>
+                        <textarea placeholder="Detail" class="form-control" value="{{ project.content }}" name="content" id="content"></textarea>
+                    </div>
 				</div>
 				<div class="row g-3 mb-3">
-					<div class="col-12 col-md-6">
+					<div class="col-12 col-md-4">
 						<label for="title" class="form-label">Client</label>
 						<select class="form-select" name="client_id" id="client_id">
 							<option value="">Select the client</option>
@@ -25,19 +29,40 @@
                             {% endfor %}
 						</select>
 					</div>
-					<div class="col-12 col-md-6">
+					<div class="col-12 col-md-4">
 						<label for="title" class="form-label">DeadLine</label>
 						<input type="date" class="form-control" name="deadline" value="{{ project.deadLine }}" id="deadline">
 					</div>
-				</div>
-				<div class="row g-3 mb-3">
-					<div class="col-12">
-						<label for="title" class="form-label">Tags</label>
-                        <input type="text" class="form-control" placeholder="Project tags" value="{{ project.tags|map(p => p.name)|join(',') }}" name="tags" id="tags">
+					<div class="col-12 col-md-4">
+						<label for="title" class="form-label">Priority</label>
+						<input type="text" class="form-control" name="priority" value="{{ project.priority }}" id="priority">
 					</div>
 				</div>
 				<div class="row g-3 mb-3">
-					<div class="col-12 col-md-6">
+					<div class="col-4">
+						<label for="title" class="form-label">Tags</label>
+                        <input type="text" class="form-control" placeholder="Project tags" value="{{ project.tags|map(p => p.name)|join(',') }}" name="tags" id="tags">
+					</div>
+                    <div class="col-4">
+                        <label for="title" class="form-label">Type</label>
+                        <input type="text" class="form-control" placeholder="Project type" value="{{ project.type }}" name="type" id="type">
+                    </div>
+                    <div class="col-4">
+                        <label for="title" class="form-label">Tags</label>
+                        <input type="text" class="form-control" placeholder="Project sandbox" value="{{ project.sandboxes }}" name="sandbox" id="sandbox">
+                    </div>
+				</div>
+				<div class="row g-3 mb-3">
+                    <div class="col-12 col-md-4">
+                        <label for="title" class="form-label">Applicant</label>
+                        <select class="form-select" name="applicant" id="applicant">
+                            <option value="">Select the applicant</option>
+                            {% for applicant in project %}
+                                <option {{ applicant.id == project.applicant.id ? 'selected' : '' }} value="{{ applicant.id }}">{{ applicant.firstname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+					<div class="col-12 col-md-4">
 						<label for="title" class="form-label">Manager</label>
 						<select class="form-select" name="manager_id" id="manager_id">
 							<option value="">Select the manager</option>
@@ -46,7 +71,7 @@
                             {% endfor %}
 						</select>
 					</div>
-					<div class="col-12 col-md-6">
+					<div class="col-12 col-md-4">
 						<label for="title" class="form-label">Team</label>
 						<select class="form-select" name="team_id" id="team_id">
 							<option value="">Asign the project to a team</option>

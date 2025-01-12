@@ -114,6 +114,7 @@ class ProjectController extends AbstractController
         $manager = $this->userRepository->find($request->get('manager_id'));
         $team = $this->teamRepository->find($request->get('team_id'));
 
+
         // Récupération de la sandbox (ou valeur par défaut à null)
         $sandboxId = $request->get('sandboxes');
         $sandbox = $sandboxId ? $this->sandboxRepository->find($sandboxId) : null;

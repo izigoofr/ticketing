@@ -92,7 +92,7 @@ class ApplicantController extends AbstractController
 
             // Envoi d'email
             $email = (new Email())
-                ->from(new Address('contact@app-dev.fr', 'Florajet'))
+                ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
                 ->to('f.stoessel@florajet.com') // Liste d'adresses
                 ->subject('Création d\'un nouveau projet')
                 ->text('Un nouveau projet a été créé dans votre application.')
