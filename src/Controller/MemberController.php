@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 
 class MemberController extends AbstractController
@@ -57,7 +57,7 @@ class MemberController extends AbstractController
         $project = $this->projectRepository->find($id);
         $task = $this->manager->getRepository(Task::class)->find($task_id);
         return $this->render('member/task-details.html.twig', [
-            'project' => $project, 
+            'project' => $project,
             'task' => $task
         ]);
     }
@@ -111,7 +111,7 @@ class MemberController extends AbstractController
         foreach ($comments as $comment) {
             $fullName = $comment->getUser()->getFirstName() . ' ' . $comment->getUser()->getLastName();
             $imagePath = $comment->getUser()->getImagePath();
-            
+
             $serializedComments[] = [
                 'id' => $comment->getId(),
                 'fullName' => $fullName,
@@ -121,7 +121,7 @@ class MemberController extends AbstractController
                 // Add other properties you want to include in the response
             ];
         }
-        
+
         return new JsonResponse($serializedComments);
     }
 

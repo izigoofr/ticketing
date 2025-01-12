@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
@@ -18,7 +18,7 @@ class UserController extends AbstractController
     private $manager;
     private $userRepository;
     private $passwordHasher;
-    
+
 
     public function __construct(EntityManagerInterface $manager, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface){
         $this->userRepository= $userRepository;
@@ -62,7 +62,7 @@ class UserController extends AbstractController
             ->setPhoneNumber($request->get('phonenumber'))
             ->setState($request->get('state'))
             ->setZipCode($request->get('zipcode'));
-        
+
         $this->manager->persist($user);
         $this->manager->flush();
         return new Response('created');
@@ -112,7 +112,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/members/{id}/protmote-to-manager', name: 'promote_to_manager', methods:'POST')]
-    public function promoteToManager($id) : Response{  
+    public function promoteToManager($id) : Response{
         $user = $this->userRepository->find($id);
         $user->setRoles(['ROLE_MANAGER']);
         $this->manager->flush();
@@ -121,7 +121,7 @@ class UserController extends AbstractController
 
 
     #[Route('/members/{id}/demote-from-manager', name: 'demote_from_manager', methods:'POST')]
-    public function demoteFromManager($id) : Response{  
+    public function demoteFromManager($id) : Response{
         $user = $this->userRepository->find($id);
         $user->setRoles([]);
         $this->manager->flush();

@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TeamController extends AbstractController
 {
@@ -69,7 +69,7 @@ class TeamController extends AbstractController
 
         return new JsonResponse($team_data);
     }
-    
+
 
     #[Route('/team/{id}/add-member/{user_id}', name: 'add_member', methods: 'POST')]
     public function addMember($id, $user_id) : JsonResponse{

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 
 class ManagerController extends AbstractController
@@ -63,7 +63,7 @@ class ManagerController extends AbstractController
         }else{
             $project->setStatus($request->get('status'));
         }
-        
+
         $this->manager->flush();
         return new Response('updated');
     }
@@ -188,7 +188,7 @@ class ManagerController extends AbstractController
 
     #[Route('/manager/project/{id}/remove-dependency/task', methods: 'POST' ,name: 'remove_depedency')]
     public function removeDependency(Request $request, $id) : Response{
-        
+
         $dependency = $this->manager->getRepository(TaskDependency::class)->find($id);
         $this->manager->remove($dependency);
         $this->manager->flush();
@@ -223,7 +223,7 @@ class ManagerController extends AbstractController
         $project = $this->projectRepository->find($id);
         $task = $this->manager->getRepository(Task::class)->find($task_id);
         return $this->render('manager/task-details.html.twig', [
-            'project' => $project, 
+            'project' => $project,
             'task' => $task
         ]);
     }
@@ -240,6 +240,5 @@ class ManagerController extends AbstractController
         $this->manager->flush();
         return new Response('sended');
     }
-    
+
 }
- 
