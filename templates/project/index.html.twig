@@ -29,8 +29,8 @@
 				<thead class="table-light">
 					<tr>
 						<th>Project</th>
-						<th>Service</th>
-						<th>PRIORTY</th>
+						<th>Applicant</th>
+						<th>Priority</th>
 						<th>Status</th>
 						<th>Start date</th>
 						<th class="text-center">Actions</th>
@@ -42,7 +42,7 @@
                             <td>
                                 <strong>{{ project.title }}</strong>
                             </td>
-                            <td>{{ project.client.firstName ~ ' ' ~ project.client.lastName }}</td>
+                            <td>{{ project.applicant }}</td>
                            <td>
                                 {% if project.priority == 1 %}
                                     <span class="priority-low">● </span>

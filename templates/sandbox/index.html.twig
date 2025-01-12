@@ -4,13 +4,22 @@
 
 {% block content %}
     <h1>Sandbox</h1>
+    {% for type, messages in app.flashes %}
+        <div class="alert alert-{{ type }}" role="alert">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <a class="btn btn-primary" href="{{ path('app_sandbox_new') }}">Create new</a>
     <table class="table">
         <thead>
         <tr>
             <th>Id</th>
             <th>Title</th>
-            <th>Content</th>
+            <th>Applicant</th>
             <th>Tagged Users</th>
+            <th>Date</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -19,7 +28,8 @@
             <tr>
                 <td>{{ sandbox.id }}</td>
                 <td>{{ sandbox.title }}</td>
-                <td>{{ sandbox.content|raw }}</td>
+                <td>{{ sandbox.users.firstName }}</td>
+
                 <td>
                     {% if sandbox.taggedUsers|length > 0 %}
                         <ul>
@@ -31,6 +41,7 @@
                         No tagged users
                     {% endif %}
                 </td>
+                <td>{{ sandbox.createdAt|date("d/m/Y") }}</td>
                 <td>
                     <a class="btn btn-info btn-sm" href="{{ path('app_sandbox_show', {'id': sandbox.id}) }}">Show</a>
                     <a class="btn btn-warning btn-sm" href="{{ path('app_sandbox_edit', {'id': sandbox.id}) }}">Edit</a>
@@ -45,5 +56,5 @@
     </table>
 
 
-    <a class="btn btn-primary" href="{{ path('app_sandbox_new') }}">Create new</a>
+
 {% endblock %}

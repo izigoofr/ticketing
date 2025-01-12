@@ -3,6 +3,7 @@
 {% block title %}Project index{% endblock %}
 
 {% block content %}
+
     <h1>Request - Ticketing</h1>
     {% for type, messages in app.flashes %}
         <div class="alert alert-{{ type }}" role="alert">
@@ -11,21 +12,49 @@
             {% endfor %}
         </div>
     {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card border-secondary mb-3" style="max-width: 18rem;">
+
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">15</h5>
+                        <p class="card-text">Ticketing total</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card border-secondary mb-3" style="max-width: 18rem;">
+
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">10 </h5>
+                        <p class="card-text">Ticketing cours</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card border-secondary mb-3" style="max-width: 18rem;">
+
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">5</h5>
+                        <p class="card-text">Ticketing fini</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <a class="btn btn-primary" href="{{ path('app_applicant_new') }}">Create new</a>
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Start_date</th>
-
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Applicant</th>
-
-                <th>Content</th>
-                <th>actions</th>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Start_date</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Developer</th>
+            <th>actions</th>
+        </tr>
         </thead>
         <tbody>
         {% for project in projects %}
@@ -34,19 +63,36 @@
                 <td>{{ project.title }}</td>
 
                 {% if project.startDate == null %}
-                <td>Pas assigner</td>
+                    <td>No date</td>
                 {% else %}
-                <td>{{ project.startDate }}</td>
-                    {% endif %}
-
-                <td>{{ project.status }}</td>
-                <td>{{ project.priority }}</td>
-                <td>{{ project.applicant }}</td>
-
-                <td>{{ project.content }}</td>
+                    <td>{{ project.startDate }}</td>
+                {% endif %}
                 <td>
-                    <a class="btn btn-primary btn-sm" href="{{ path('app_applicant_show', {'id': project.id}) }}">show</a>
-                    <a class="btn btn-warning btn-sm" href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
+				<span class="badge
+                  {% if project.status == 'Not Started Yet' %}bg-label-dark
+                  {% elseif project.status == 'Pending' %}bg-label-info
+                  {% elseif project.status == 'In Progress' %}bg-label-primary
+                  {% elseif project.status == 'Finished' %}bg-label-success
+                  {% endif %} me-1">
+                  {{ project.status }}
+                </span>
+
+                </td>
+                <td>{{ project.priority }}</td>
+                <td>
+                    {% if project.tasks is empty %}
+                    no developer
+                    {% else %}
+                    {% for task in project.tasks %}
+                        {{ task.user.firstName }} {{ task.user.lastName }}<br>
+                    {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm"
+                       href="{{ path('app_applicant_show', {'id': project.id}) }}">show</a>
+                    <a class="btn btn-warning btn-sm"
+                       href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

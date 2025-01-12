@@ -3,6 +3,62 @@
 {% block title %}Project{% endblock %}
 
 {% block content %}
+
+    <style>
+        /* Styles pour les images redimensionnées dans CKEditor */
+        figure.image_resized img {
+            max-width: 150%; /* Empêche l'image de dépasser son conteneur */
+            height: auto; /* Maintient le ratio de l'image */
+        }
+
+        figure.image_resized {
+            display: inline-block;
+            max-width: 100%; /* S'assure que la figure ne dépasse pas son conteneur */
+        }
+
+        figure.image_resized img {
+            cursor: pointer; /* Indique que l'image est cliquable */
+            transition: transform 0.3s ease;
+        }
+
+        figure.image_resized img:hover {
+            transform: scale(1.1); /* Zoom léger au survol */
+        }
+
+        /* Superposition pour afficher l'image en plein écran */
+        .image-overlay {
+            display: none; /* Masqué par défaut */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .image-overlay .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+    </style>
+
+
     <h1>Request - Ticketing</h1>
 
     <table class="table">
@@ -41,7 +97,7 @@
             </tr>
             <tr>
                 <th>Content</th>
-                <td>{{ project.content }}</td>
+                <td>{{ project.content|raw }}</td>
             </tr>
         </tbody>
     </table>
@@ -49,6 +105,39 @@
     <a class="btn btn-info mt-3" href="{{ path('applicant') }}">back to list</a>
 
     <a class="btn btn-warning mt-3" href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
+    <!-- Superposition pour l'image -->
+    <div class="image-overlay" id="image-overlay">
+        <button class="close-btn" id="close-overlay">✕</button>
+        <img src="" alt="Agrandissement" id="overlay-image">
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Récupère toutes les images dans les contenus CKEditor
+            const images = document.querySelectorAll('figure.image_resized img');
 
+            const overlay = document.getElementById('image-overlay');
+            const overlayImage = document.getElementById('overlay-image');
+            const closeOverlay = document.getElementById('close-overlay');
+
+            images.forEach(image => {
+                image.addEventListener('click', () => {
+                    overlayImage.src = image.src; // Définit la source de l'image cliquée
+                    overlay.style.display = 'flex'; // Affiche la superposition
+                });
+            });
+
+            // Ferme la superposition
+            closeOverlay.addEventListener('click', () => {
+                overlay.style.display = 'none';
+            });
+
+            // Ferme la superposition en cliquant à l'extérieur de l'image
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+    </script>
 
 {% endblock %}

@@ -5,7 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     database_internet_url: '%env(DATABASE_INTERNET_URL)%'
-    uploads_directory: '%kernel.project_dir%/public/test'
+    uploads_directory: '%kernel.project_dir%/public/upload'
+
 
 services:
     App\Service\CustomService:
@@ -31,3 +32,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']

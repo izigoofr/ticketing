@@ -1,47 +1,161 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sandbox{% endblock %}
+{% block title %}{{ sandbox.title }}{% endblock %}
 
 {% block content %}
-    <h1>Sandbox</h1>
-    <a class="btn btn-info" href="{{ path('app_sandbox_index') }}">back to list</a>
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ sandbox.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ sandbox.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ sandbox.content|raw }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ sandbox.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <style>
+        /* Styles pour les images redimensionnées dans CKEditor */
+        figure.image_resized img {
+            max-width: 100%; /* Empêche l'image de dépasser son conteneur */
+            height: auto; /* Maintient le ratio de l'image */
+        }
 
-    <h2>Comments:</h2>
-    <ul>
-        {% for comment in sandbox.comments %}
-            <li>{{ comment.content|raw }}</li>
-        {% else %}
-            <li>No comments yet.</li>
-        {% endfor %}
-    </ul>
+        figure.image_resized {
+            display: inline-block;
+            max-width: 100%; /* S'assure que la figure ne dépasse pas son conteneur */
+        }
 
+        figure.image_resized img {
+            cursor: pointer; /* Indique que l'image est cliquable */
+            transition: transform 0.3s ease;
+        }
 
+        figure.image_resized img:hover {
+            transform: scale(1.1); /* Zoom léger au survol */
+        }
 
+        /* Superposition pour afficher l'image en plein écran */
+        .image-overlay {
+            display: none; /* Masqué par défaut */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
 
-    <h2>Ajouter un commentaire :</h2>
-    {{ form_start(commentForm) }}
-    {{ form_row(commentForm.content) }}
-    <button class="btn btn-success" type="submit">Envoyer</button>
-    {{ form_end(commentForm) }}
+        .image-overlay .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .comments-section {
+            margin-top: 30px;
+        }
+
+        .comments-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comment-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+
+    <a class="btn btn-secondary mb-4" href="{{ path('app_sandbox_index') }}">Retour à la liste</a>
+    <div class="comment-item">
+        <header class="blog-header">
+            <h1 class="blog-title">{{ sandbox.title }}</h1>
+            <p class="blog-meta">
+                Publié le <b>{{ sandbox.createdAt|date("d/m/Y", "Europe/Paris") }}</b> par <b>{{ sandbox.users.firstName }}</b>
+            </p>
+        </header>
+
+        <div class="blog-content">
+            {{ sandbox.content|raw }}
+        </div>
+
+        <!-- Superposition pour l'image -->
+        <div class="image-overlay" id="image-overlay">
+            <button class="close-btn" id="close-overlay">✕</button>
+            <img src="" alt="Agrandissement" id="overlay-image">
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <h2>Commentaires</h2>
+        <ul class="comments-list">
+            {% for comment in sandbox.comments %}
+                <li class="comment-item">
+                    <p class="blog-meta">
+                        Publié le <b>{{ comment.createAt|date("d/m/Y", "Europe/Paris") }}</b> par <b>{{ comment.users.firstname }}</b>
+                    </p>
+                    <p>{{ comment.content|raw }}</p>
+                </li>
+            {% else %}
+                <li class="no-comments">Aucun commentaire pour le moment.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="add-comment">
+        <h2>Ajouter un commentaire</h2>
+        {{ form_start(commentForm, { 'attr': { 'class': 'comment-form' } }) }}
+        <div class="form-group">
+            {{ form_row(commentForm.content, { 'attr': { 'class': 'form-control' } }) }}
+        </div>
+        <button class="btn btn-primary" type="submit">Envoyer</button>
+        {{ form_end(commentForm) }}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Récupère toutes les images dans les contenus CKEditor
+            const images = document.querySelectorAll('figure.image_resized img');
+
+            const overlay = document.getElementById('image-overlay');
+            const overlayImage = document.getElementById('overlay-image');
+            const closeOverlay = document.getElementById('close-overlay');
+
+            images.forEach(image => {
+                image.addEventListener('click', () => {
+                    overlayImage.src = image.src; // Définit la source de l'image cliquée
+                    overlay.style.display = 'flex'; // Affiche la superposition
+                });
+            });
+
+            // Ferme la superposition
+            closeOverlay.addEventListener('click', () => {
+                overlay.style.display = 'none';
+            });
+
+            // Ferme la superposition en cliquant à l'extérieur de l'image
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+    </script>
 {% endblock %}

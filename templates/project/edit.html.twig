@@ -42,7 +42,7 @@
 						<select class="form-select" name="manager_id" id="manager_id">
 							<option value="">Select the manager</option>
 							{% for manager in managers %}
-                                <option {{ manager.id == project.user.id ? 'selected' : '' }} value="{{ manager.id }}">manager {{manager.lastName}}</option>
+                                <option {{ manager.id == project.user.id ? 'selected' : '' }} value="{{ manager.id }}">manager {{manager.firstname}}</option>
                             {% endfor %}
 						</select>
 					</div>

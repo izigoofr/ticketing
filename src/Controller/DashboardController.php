@@ -44,8 +44,8 @@ class DashboardController extends AbstractController
     $users = $this->userRepository->findAll(); // Tous les utilisateurs
 
     // Liste des noms de famille à exclure
-    $excludedLastNames = ['Virginie', 'Melanie', 'root']; // Exemple de noms exclus
-    $allowedFirstNames = ['Franck', 'John', 'Alice'];
+    $excludedLastNames = ['Virginie', 'Melanie', 'root', 'Franck', 'Oceane']; // Exemple de noms exclus
+
 
 
 

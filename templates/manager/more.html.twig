@@ -1,5 +1,58 @@
 {% extends 'base.html.twig' %}
 {% block layout %}
+    <style>
+        /* Styles pour les images redimensionnées dans CKEditor */
+        figure.image_resized img {
+            max-width: 150%; /* Empêche l'image de dépasser son conteneur */
+            height: auto; /* Maintient le ratio de l'image */
+        }
+
+        figure.image_resized {
+            display: inline-block;
+            max-width: 100%; /* S'assure que la figure ne dépasse pas son conteneur */
+        }
+
+        figure.image_resized img {
+            cursor: pointer; /* Indique que l'image est cliquable */
+            transition: transform 0.3s ease;
+        }
+
+        figure.image_resized img:hover {
+            transform: scale(1.1); /* Zoom léger au survol */
+        }
+
+        /* Superposition pour afficher l'image en plein écran */
+        .image-overlay {
+            display: none; /* Masqué par défaut */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .image-overlay .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+
+        }
+    </style>
 	<div class="layout-wrapper layout-content-navbar layout-without-menu">
 		<div
 			class="layout-container">
@@ -29,9 +82,9 @@
 											<tbody class="table-border-bottom-0">
 												<tr class="border-top">
 													<td>
-														<span class="fw-bold">Manager :
+														<span class="fw-bold">Applicant :
 														</span>
-														{{project.user.firstName ~ ' ' ~ project.user.lastName}}
+														{{ project.applicant }}
 													</td>
 													<td>
 														<span class="fw-bold">Team :</span>
@@ -111,6 +164,25 @@
 									</div>
 								</div>
 							</div>
+                            <div class="col-12">
+                                <div class="card comments-container" style="max-height: 350px">
+                                    <div class="card-header border-bottom">
+                                        <h5 class="m-0">Information applicant</h5>
+                                    </div>
+                                    <div class="card-body py-2 content">
+                                        <div class="row g-2" id="">
+
+                                            {{ project.content|raw }}
+
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-top py-3">
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#new_information_modal">
+                                            add new information
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 							<div class="col-12">
 								<div class="card comments-container" style="max-height: 350px">
 									<div class="card-header border-bottom">
@@ -285,6 +357,36 @@
                                 </div>
                             </div>
                         </form>
+
+                        <!--new information modal-->
+                        <form id="new_information_form">
+                            <div class="modal fade" id="new_information_modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Add new information</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body py-1">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <textarea name="content" id="projectCommentContent" class="form-control" cols="30" rows="5" placeholder="write your information here.."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer pb-2">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
 					</div>
 					<!-- / Content -->
 
@@ -295,6 +397,10 @@
 			<!-- / Layout page -->
 		</div>
 	</div>
+    <div class="image-overlay" id="image-overlay">
+        <button class="close-btn" id="close-overlay">✕</button>
+        <img src="" alt="Agrandissement" id="overlay-image">
+    </div>
 {% endblock %}
 {% block javascript %}
     <script>
@@ -460,7 +566,7 @@
                                 })
                             }
                         }).fail(function(){
-                            
+
                             Swal.fire({
                                 position: 'center',
                                 icon: 'error',
@@ -472,5 +578,34 @@
                     })
             })
       });
+    </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Récupère toutes les images dans les contenus CKEditor
+            const images = document.querySelectorAll('figure.image_resized img');
+
+            const overlay = document.getElementById('image-overlay');
+            const overlayImage = document.getElementById('overlay-image');
+            const closeOverlay = document.getElementById('close-overlay');
+
+            images.forEach(image => {
+                image.addEventListener('click', () => {
+                    overlayImage.src = image.src; // Définit la source de l'image cliquée
+                    overlay.style.display = 'flex'; // Affiche la superposition
+                });
+            });
+
+            // Ferme la superposition
+            closeOverlay.addEventListener('click', () => {
+                overlay.style.display = 'none';
+            });
+
+            // Ferme la superposition en cliquant à l'extérieur de l'image
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
     </script>
 {% endblock %}

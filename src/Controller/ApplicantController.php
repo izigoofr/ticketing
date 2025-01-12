@@ -25,31 +25,26 @@ use Symfony\Component\Security\Core\Security;
 class ApplicantController extends AbstractController
 {
     #[Route('/', name: 'applicant', methods: ['GET'])]
-    public function index(ProjectRepository $projectRepository, Security $security): Response
+    public function index(ProjectRepository $projectRepository): Response
     {
-        // Récupérer l'utilisateur connecté
-        $user = $security->getUser();
 
-        if (!$user) {
-            throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
-        }
-
-        // Récupérer les projets de l'utilisateur connecté
-        $projects = $projectRepository->findBy(['user' => $user]);
+// recuperer les projets de l'utilisateur connecté par rapport à son applicant
+        $projects = $projectRepository->findBy(['applicant' => $this->getUser()->getFirstName()]);
 
         return $this->render('applicant/index.html.twig', [
             'projects' => $projects,
         ]);
-
     }
+
 
     #[Route('/new', name: 'app_applicant_new', methods: ['GET', 'POST'])]
     public function new(
-        Request $request,
+        Request                $request,
         EntityManagerInterface $entityManager,
-        Security $security,
-        MailerInterface $mailer
-    ): Response {
+        Security               $security,
+        MailerInterface        $mailer
+    ): Response
+    {
         $user = $security->getUser();
 
         if (!$user) {
@@ -92,14 +87,13 @@ class ApplicantController extends AbstractController
             }
 
 
-
             $entityManager->persist($project);
             $entityManager->flush();
 
             // Envoi d'email
             $email = (new Email())
                 ->from(new Address('contact@app-dev.fr', 'Florajet'))
-                ->to('f.stoessel@florajet.com', 'g.carnoy@florajet.com') // Liste d'adresses
+                ->to('f.stoessel@florajet.com') // Liste d'adresses
                 ->subject('Création d\'un nouveau projet')
                 ->text('Un nouveau projet a été créé dans votre application.')
                 ->html('<p>Un nouveau projet a été créé.</p>');
@@ -113,6 +107,9 @@ class ApplicantController extends AbstractController
                 $this->addFlash('danger', 'Le projet a été créé, mais une erreur est survenue lors de l\'envoi de l\'email.');
             }
 
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('project_list');
+            }
             return $this->redirectToRoute('applicant', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -121,8 +118,6 @@ class ApplicantController extends AbstractController
             'form' => $form,
         ]);
     }
-
-
 
 
     #[Route('/{id}', name: 'app_applicant_show', methods: ['GET'])]
@@ -154,7 +149,7 @@ class ApplicantController extends AbstractController
     #[Route('/{id}', name: 'app_applicant_delete', methods: ['POST'])]
     public function delete(Request $request, Project $project, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$project->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $project->getId(), $request->request->get('_token'))) {
             $entityManager->remove($project);
             $entityManager->flush();
         }

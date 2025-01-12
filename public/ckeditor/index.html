@@ -11,21 +11,39 @@
 		<link rel="apple-touch-icon" type="image/png" href="https://ckeditor.com/assets/images/favicons/180x180.png" sizes="180x180">
 		<link rel="stylesheet" href="./style.css">
 		<link rel="stylesheet" href="./ckeditor5/ckeditor5.css">
+		<link rel="stylesheet" href="./ckeditor5-premium-features/ckeditor5-premium-features.css">
 	</head>
 	<body>
 		<div class="main-container">
-			<div class="editor-container editor-container_classic-editor" id="editor-container">
-				<div class="editor-container__editor"><div id="editor"></div></div>
+			<div class="presence" id="editor-presence"></div>
+			<div
+				class="editor-container editor-container_classic-editor editor-container_include-outline editor-container_include-annotations"
+				id="editor-container"
+			>
+				<div class="editor-container__editor-wrapper">
+					<div class="editor-container__sidebar"><div id="editor-outline"></div></div>
+					<div class="editor-container__editor"><div id="editor"></div></div>
+					<div class="editor-container__sidebar"><div id="editor-annotations"></div></div>
+				</div>
+			</div>
+			<div class="revision-history" id="editor-revision-history">
+				<div class="revision-history__wrapper">
+					<div class="revision-history__editor" id="editor-revision-history-editor"></div>
+					<div class="revision-history__sidebar" id="editor-revision-history-sidebar"></div>
+				</div>
 			</div>
 		</div>
 		<script type="importmap">
 		{
 			"imports": {
 				"ckeditor5": "./ckeditor5/ckeditor5.js",
-				"ckeditor5/": "./ckeditor5/"
+				"ckeditor5/": "./ckeditor5/",
+				"ckeditor5-premium-features": "./ckeditor5-premium-features/ckeditor5-premium-features.js",
+				"ckeditor5-premium-features/": "./ckeditor5-premium-features/"
 			}
 		}
 		</script>
+		<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 		<script type="module" src="./main.js"></script>
 		<!-- A friendly reminder to run on a server, remove this during the integration. -->
 		<script>

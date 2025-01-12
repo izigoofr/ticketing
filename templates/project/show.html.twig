@@ -10,9 +10,9 @@
 				<tbody class="table-border-bottom-0">
 					<tr class="border-top">
 						<td>
-							<span class="fw-bold">Manager :
+							<span class="fw-bold">Applicant :
 							</span>
-                            {{ project.user.firstName ~ ' ' ~ project.user.lastName }}
+                            {{ project.applicant }}
 						</td>
 						<td>
 							<span class="fw-bold">Team :</span>
@@ -42,7 +42,7 @@
 							<span class="fw-bold">
 								Status :
 							</span>
-							<span class="badge 
+							<span class="badge
                                 {% if project.status == 'Not Started Yet' %}
                                     bg-label-dark
                                 {% elseif project.status == 'Pending' %}
@@ -61,8 +61,8 @@
 	</div>
 	<div class="card py-2 mb-4">
     <h5 class="card-header pt-3 pb-1 m-0">Project Tags</h5>
-    <input type="text" name="tags" id="tags" 
-           value="{% if project.tags|length > 0 %}{{ project.tags|map(tag => tag.name)|join(', ') }}{% else %}{% endif %}" 
+    <input type="text" name="tags" id="tags"
+           value="{% if project.tags|length > 0 %}{{ project.tags|map(tag => tag.name)|join(', ') }}{% else %}{% endif %}"
            class="form-control py-1 px-3 shadow-none border-0">
 </div>
 

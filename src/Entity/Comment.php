@@ -22,6 +22,12 @@ class Comment
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Sandbox $sandbox = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $createAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    private ?User $users = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,6 +53,30 @@ class Comment
     public function setSandbox(?Sandbox $sandbox): static
     {
         $this->sandbox = $sandbox;
+
+        return $this;
+    }
+
+    public function getCreateAt(): ?\DateTimeImmutable
+    {
+        return $this->createAt;
+    }
+
+    public function setCreateAt(?\DateTimeImmutable $createAt): static
+    {
+        $this->createAt = $createAt;
+
+        return $this;
+    }
+
+    public function getUsers(): ?User
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?User $users): static
+    {
+        $this->users = $users;
 
         return $this;
     }
