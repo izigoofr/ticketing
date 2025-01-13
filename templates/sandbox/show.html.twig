@@ -84,6 +84,13 @@
     </style>
 
     <a class="btn btn-secondary mb-4" href="{{ path('app_sandbox_index') }}">Retour à la liste</a>
+    {% for type, messages in app.flashes %}
+        <div class="alert alert-{{ type }}" role="alert">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
     <div class="comment-item">
         <header class="blog-header">
             <h1 class="blog-title">{{ sandbox.title }}</h1>
@@ -105,6 +112,7 @@
 
     <div class="comments-section">
         <h2>Commentaires</h2>
+
         <ul class="comments-list">
             {% for comment in sandbox.comments %}
                 <li class="comment-item">

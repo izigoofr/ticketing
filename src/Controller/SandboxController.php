@@ -33,7 +33,7 @@ class SandboxController extends AbstractController
     }
 
     #[Route('/new', name: 'app_sandbox_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, Security $security,  MailerInterface $mailer): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Security $security, MailerInterface $mailer): Response
     {
         $sandbox = new Sandbox();
         $form = $this->createForm(SandboxType::class, $sandbox);
@@ -115,7 +115,7 @@ class SandboxController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sandbox_show', methods: ['GET', 'POST'])]
-    public function show(Sandbox $sandbox, FormFactoryInterface $formFactory, Request $request, EntityManagerInterface $entityManager, Security $security): Response
+    public function show(Sandbox $sandbox, FormFactoryInterface $formFactory, Request $request, EntityManagerInterface $entityManager, Security $security, MailerInterface $mailer): Response
     {
         $comment = new Comment();
         $form = $formFactory->create(CommentType::class, $comment, [
@@ -135,6 +135,35 @@ class SandboxController extends AbstractController
             $comment->setCreateAt(new \DateTimeImmutable('now'));
             $entityManager->persist($comment);
             $entityManager->flush();
+
+            // envoi de mail
+            $email = (new Email())
+                ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
+                ->to($sandbox->getUsers()->getEmail()) // Email de l'utilisateur qui crée la sandbox
+                ->subject('Nouveau commentaire sur votre sandbox')
+                ->text(sprintf(
+                    "Un nouveau commentaire a été ajouté à votre sandbox :\n\n- Utilisateur : %s\n- Commentaire : %s\n- Date de création : %s",
+                    $user->getEmail(),
+                    $comment->getContent(),
+                    $comment->getCreateAt()->format('d/m/Y H:i')
+                ))
+                ->html(sprintf(
+                    '<p>Un nouveau commentaire a été ajouté à votre sandbox :</p>
+                             <ul>
+                                 <li><strong>Utilisateur :</strong> %s</li>
+                                 <li><strong>Commentaire :</strong> %s</li>
+                                 <li><strong>Date de création :</strong> %s</li>
+                             </ul>',
+                    htmlspecialchars($user->getEmail(), ENT_QUOTES),
+                    htmlspecialchars($comment->getContent(), ENT_QUOTES),
+                    htmlspecialchars($comment->getCreateAt()->format('d/m/Y H:i'), ENT_QUOTES)
+                ));
+            try {
+                $mailer->send($email);
+                $this->addFlash('success', 'Le commentaire a été ajouté et une notification a été envoyée à l\'utilisateur.');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Le commentaire a été ajouté, mais une erreur est survenue lors de l\'envoi de l\'email.');
+            }
 
             // Redirigez après soumission
             return $this->redirectToRoute('app_sandbox_show', ['id' => $sandbox->getId()]);
