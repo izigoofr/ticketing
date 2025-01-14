@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProjectComment{% endblock %}
+
+{% block body %}
+    <h1>ProjectComment</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ project_comment.id }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ project_comment.content }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ project_comment.createdAt ? project_comment.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_project_comment_index') }}">back to list</a>
+
+    <a href="{{ path('app_project_comment_edit', {'id': project_comment.id}) }}">edit</a>
+
+    {{ include('project_comment/_delete_form.html.twig') }}
+{% endblock %}

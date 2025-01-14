@@ -26,6 +26,9 @@ class ProjectComment
     #[ORM\ManyToOne(inversedBy: 'projectComments')]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $developerEmail = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class ProjectComment
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeveloperEmail(): ?string
+    {
+        return $this->developerEmail;
+    }
+
+    public function setDeveloperEmail(?string $developerEmail): static
+    {
+        $this->developerEmail = $developerEmail;
 
         return $this;
     }

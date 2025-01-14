@@ -67,6 +67,9 @@ class Project
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Sandbox $sandboxes = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $mailApplicant = null;
+
 
     public function __construct()
     {
@@ -353,6 +356,18 @@ class Project
     public function setSandboxes(?Sandbox $sandboxes): static
     {
         $this->sandboxes = $sandboxes;
+
+        return $this;
+    }
+
+    public function getMailApplicant(): ?string
+    {
+        return $this->mailApplicant;
+    }
+
+    public function setMailApplicant(?string $mailApplicant): static
+    {
+        $this->mailApplicant = $mailApplicant;
 
         return $this;
     }

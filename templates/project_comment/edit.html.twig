@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ProjectComment{% endblock %}
+
+{% block content %}
+    <h1>Edit ProjectComment</h1>
+
+    {{ include('project_comment/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_project_comment_index') }}">back to list</a>
+
+    {{ include('project_comment/_delete_form.html.twig') }}
+{% endblock %}
