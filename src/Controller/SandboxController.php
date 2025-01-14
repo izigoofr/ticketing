@@ -124,7 +124,6 @@ class SandboxController extends AbstractController
         ]);
 
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $security->getUser();
             if (!$user) {
@@ -135,8 +134,6 @@ class SandboxController extends AbstractController
             $comment->setCreateAt(new \DateTimeImmutable('now'));
             $entityManager->persist($comment);
             $entityManager->flush();
-
-            // envoi de mail
             $email = (new Email())
                 ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
                 ->to($sandbox->getUsers()->getEmail()) // Email de l'utilisateur qui crée la sandbox
