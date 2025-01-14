@@ -58,8 +58,14 @@
 
     </style>
 
-
     <h1>Request - Ticketing</h1>
+    <a class="btn btn-info mt-3 btn-sm" href="{{ path('applicant') }}">back to list</a>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
 
     <table class="table">
         <tbody>
@@ -101,10 +107,67 @@
             </tr>
         </tbody>
     </table>
-
-    <a class="btn btn-info mt-3" href="{{ path('applicant') }}">back to list</a>
-
-    <a class="btn btn-warning mt-3" href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
+    <div class="col-12">
+        <div class="card comments-container" style="max-height: 350px">
+            <div class="card-header border-bottom">
+                <h5 class="m-0">Project comments</h5>
+            </div>
+            <div class="card-body py-2 content">
+                <div class="row g-2" id="project_comments">
+                    {% if projectComments is not empty %}
+                        {% for comment in projectComments %}
+                            <div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
+                                <img src="{{ asset(comment.user.imagePath != null ? comment.user.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar rounded-circle"/>
+                                <div class="d-flex flex-column">
+                                    <p class="p-0 m-0 fw-bold">{{ comment.user.firstName ~ ' ' ~ comment.user.lastName }}</p>
+                                    <div style="font-size: 0.8rem; line-height: 1.1" class="lead">
+                                        <p class="mb-1">
+                                            {{ comment.content }}
+                                        </p>
+                                        <p class="m-0" style="font-size: .6rem;">{{ comment.createdAt|date('Y-m-d H:m:s') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <h6 class="text-center lead pt-3">No comments yet</h6>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer border-top py-3">
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#new_comment_modal">
+                    add new comment
+                </button>
+            </div>
+        </div>
+    </div>
+    <form action="{{ path('new_comment', {id: project.id}) }}" method="POST">
+    <div class="modal fade" id="new_comment_modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add new Comment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-1">
+                        <div class="row">
+                            <div class="col">
+                                <textarea name="content" id="projectCommentContent" class="form-control" cols="30" rows="5" placeholder="write your comment here.."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer pb-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
     <!-- Superposition pour l'image -->
     <div class="image-overlay" id="image-overlay">
         <button class="close-btn" id="close-overlay">✕</button>
@@ -123,7 +186,7 @@
                 image.addEventListener('click', () => {
                     overlayImage.src = image.src; // Définit la source de l'image cliquée
                     overlay.style.display = 'flex'; // Affiche la superposition
-                });
+                }});
             });
 
             // Ferme la superposition

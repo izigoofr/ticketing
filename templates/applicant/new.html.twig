@@ -4,14 +4,12 @@
 
 {% block content %}
     <h1>Create new Request - Ticketing</h1>
-
-
     {{ include('applicant/_form.html.twig') }}
-
-    <a class="btn btn-info mt-3" href="{{ path('applicant') }}">back to list</a>
-
-
-
-
-
+    {% if is_granted('ROLE_ADMIN') %}
+        <a class="btn btn-info mt-3" href="{{ path('project_list') }}">Back to list</a>
+    {% elseif is_granted('ROLE_MANAGER') %}
+        <a class="btn btn-info mt-3" href="{{ path('manager') }}">Back to list</a>
+    {% elseif is_granted('ROLE_APPLICANT') %}
+        <a class="btn btn-info mt-3" href="{{ path('applicant') }}">Back to list</a>
+    {% endif %}
 {% endblock %}

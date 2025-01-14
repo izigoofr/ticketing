@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\ProjectComment;
 use App\Entity\Report;
 use App\Entity\Task;
 use App\Entity\TaskDependency;
 use App\Entity\User;
+use App\Repository\ProjectCommentRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -53,12 +58,13 @@ class MemberController extends AbstractController
     }
 
     #[Route('member/project/{id}/task/{task_id}', methods: 'GET' ,name: 'get_task_2')]
-    public function getTask($id, $task_id) : Response{
+    public function getTask($id, $task_id, ProjectCommentRepository $projectCommentRepository) : Response{
         $project = $this->projectRepository->find($id);
         $task = $this->manager->getRepository(Task::class)->find($task_id);
         return $this->render('member/task-details.html.twig', [
             'project' => $project,
-            'task' => $task
+            'task' => $task,
+            'projectComments' => $projectCommentRepository->findBy(['project' => $project]),
         ]);
     }
 
@@ -120,9 +126,51 @@ class MemberController extends AbstractController
                 'createdAt' => $comment->getCreatedAt()->format('Y-m-d H:i:s'),
                 // Add other properties you want to include in the response
             ];
+
+        }
+        return new JsonResponse($serializedComments);
+    }
+
+    #[Route('/member/{id}/new-comment', methods: 'POST' ,name: 'new_member_comment')] // franck :)
+    public function addComment(Request $request, $id, Security $security, MailerInterface $mailer) : JsonResponse{
+        $project = $this->projectRepository->find($id);
+        $comment = new ProjectComment();
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not authenticated'], 403);
         }
 
-        return new JsonResponse($serializedComments);
+        $comment->setContent($request->get('content'))
+            ->setProject($project)
+            ->setUser($security->getUser())
+            ->setDeveloperEmail($security->getUser()->getEmail())
+            ->setCreatedAt(new \DateTimeImmutable());
+        $this->manager->persist($comment);
+        $email = (new Email())
+            ->from(new Address('contact@app-prod.fr', 'Florajet ticketing')) // Adresse de l'expéditeur
+            ->to($project->getMailApplicant()) // Adresse du destinataire
+            ->subject('Nouveau commentaire ajouté au projet')
+            ->text(sprintf(
+                "Bonjour,\n\n%s a ajouté un nouveau commentaire au projet '%s':\n\n%s\n\nCordialement,\nL'équipe.",
+                $user->getFirstName() . ' ' . $user->getLastName(),
+                $project->getTitle(),
+                $comment->getContent()
+            ));
+        $mailer->send($email);
+        $this->manager->flush();
+        if($comment->getUser()->getImagePath() == null){
+            $imagePath = 'assets/img/avatars/no-avatar.png';
+        }else{
+            $imagePath = $comment->getUser()->getImagePath();
+        }
+        $data = [
+            'fullName' => $comment->getUser()->getFirstName() . ' ' . $comment->getUser()->getLastName(),
+            'imagePath' => $imagePath,
+            'content' => $comment->getContent(),
+            'createdAt' => $comment->getCreatedAt()->format('Y-m-d H:m:s')
+        ];
+
+        return new JsonResponse($data);
     }
 
 

@@ -89,10 +89,8 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a class="btn btn-primary btn-sm"
-                       href="{{ path('app_applicant_show', {'id': project.id}) }}">show</a>
-                    <a class="btn btn-warning btn-sm"
-                       href="{{ path('app_applicant_edit', {'id': project.id}) }}">edit</a>
+                    <a class="btn btn-primary btn-sm" href="{{ path('app_applicant_show', {'id': project.id}) }}">show</a>
+                    <a class="btn btn-warning btn-sm">message</a>
                 </td>
             </tr>
         {% else %}

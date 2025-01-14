@@ -12,6 +12,7 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Repository\ProjectRepository;
 use App\Repository\ReportRepository;
+use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -19,6 +20,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -55,7 +61,7 @@ class ManagerController extends AbstractController
     }
 
     #[Route('/manager/{id}/update-project-status', methods: 'POST' ,name: 'update_project_status')]
-    public function updateProjectStatus(Request $request, $id) : Response{
+    public function updateProjectStatus(Request $request, $id, MailerInterface $mailer) : Response{
         $project = $this->projectRepository->find($id);
         if($request->get('status') == 'start'){
             $project->setStatus('In Progress');
@@ -63,20 +69,48 @@ class ManagerController extends AbstractController
         }else{
             $project->setStatus($request->get('status'));
         }
-
         $this->manager->flush();
+        $email = (new Email())
+            ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
+            ->to($project->getMailApplicant())
+            ->subject('Request Status')
+            ->html('The status of your request <strong>' . $project->getTitle() . '</strong> has been changed to ' . $project->getStatus() . '.');
+        $mailer->send($email);
+        try {
+            $mailer->send($email);
+            $this->addFlash('success', 'Le statut a été créé et une notification a été envoyée.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Le statut a été créé, mais une erreur est survenue lors de l\'envoi de l\'email.');
+        } catch (TransportExceptionInterface $e) {
+            $this->addFlash('danger', 'Le statut a été créé, mais une erreur est survenue lors de l\'envoi de l\'email.');
+        }
+
         return new Response('updated');
     }
 
-    #[Route('/project/{id}/new-comment', methods: 'POST' ,name: 'new_project_comment')]
-    public function addComment(Request $request, $id, Security $security) : JsonResponse{
+    #[Route('/project/{id}/new-comment', methods: 'POST' ,name: 'new_project_comment')] // franck :)
+    public function addComment(Request $request, $id, Security $security, MailerInterface $mailer, TaskRepository $taskRepository) : JsonResponse{
         $project = $this->projectRepository->find($id);
         $comment = new ProjectComment();
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not authenticated'], 403);
+        }
+
+        // Récupération des tâches associées au projet
+        $tasks = $taskRepository->findBy(['project' => $project]);
+        $taskData = [];
+        foreach ($tasks as $task) {
+            $taskData[] = $task->getDeveloperMail(); // Supposons que cette méthode retourne l'email du développeur
+        }
+
         $comment->setContent($request->get('content'))
                 ->setProject($project)
-                ->setUser($security->getUser())
+                 ->setDeveloperEmail($security->getUser()->getEmail())
+                ->setUser($user)
                 ->setCreatedAt(new \DateTimeImmutable());
         $this->manager->persist($comment);
+
         $this->manager->flush();
         if($comment->getUser()->getImagePath() == null){
             $imagePath = 'assets/img/avatars/no-avatar.png';
@@ -89,6 +123,19 @@ class ManagerController extends AbstractController
             'content' => $comment->getContent(),
             'createdAt' => $comment->getCreatedAt()->format('Y-m-d H:m:s')
         ];
+        $email = (new Email())
+            ->from(new Address('contact@app-prod.fr', 'Florajet ticketing')) // Adresse de l'expéditeur
+            ->to($project->getMailApplicant()) // Adresse du destinataire
+            ->cc(...$taskData)
+            ->subject('Nouveau commentaire ajouté au projet')
+            ->text(sprintf(
+                "Bonjour,\n\n%s a ajouté un nouveau commentaire au projet '%s':\n\n%s\n\nCordialement,\nL'équipe.",
+                $user->getFirstName() . ' ' . $user->getLastName(),
+                $project->getTitle(),
+                $comment->getContent()
+            ));
+        $mailer->send($email);
+
         return new JsonResponse($data);
     }
 
@@ -99,6 +146,7 @@ class ManagerController extends AbstractController
         $comment->setContent($request->get('content'))
                 ->setTask($task)
                 ->setUser($security->getUser())
+                ->setDeveloperMail($task->getUser()->getEmail())
                 ->setCreatedAt(new \DateTimeImmutable());
         $this->manager->persist($comment);
         $this->manager->flush();
@@ -205,18 +253,31 @@ class ManagerController extends AbstractController
     }
 
     #[Route('/manager/project/{id}/create-task', methods: 'POST' ,name: 'create_task')]
-    public function createTask(Request $request, $id) : Response{
+    public function createTask(Request $request, $id, MailerInterface $mailer) : Response{
         $project = $this->projectRepository->find($id);
+
         $task = new Task();
         $task->setTitle($request->get('title'))
-             ->setDescription($request->get('description'))
-             ->setStatus('Not Started Yet')
-             ->setProject($project)
-             ->setUser($this->manager->getRepository(User::class)->find($request->get('user_id')));
+            ->setDescription($request->get('description'))
+            ->setDays($request->get('days'))
+            ->setGitlab($request->get('gitlab'))
+            ->setStartDate($request->get('start_date'))
+            ->setStatus('Not Started Yet')
+            ->setDeveloperMail($this->manager->getRepository(User::class)->find($request->get('user_id'))->getEmail())
+            ->setProject($project)
+            ->setUser($this->manager->getRepository(User::class)->find($request->get('user_id')));
         $this->manager->persist($task);
         $this->manager->flush();
+        // send email to developer
+        $email = (new Email())
+            ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
+            ->to($task->getDeveloperMail())
+            ->subject('New Task')
+            ->html('You have a new task to do <strong>' . $task->getTitle() . '</strong>.');
+        $mailer->send($email);
         return new Response('created');
     }
+
 
     #[Route('/project/{id}/task/{task_id}', methods: 'GET' ,name: 'get_task')]
     public function getTask($id, $task_id) : Response{

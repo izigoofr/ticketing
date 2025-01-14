@@ -103,11 +103,6 @@ class SandboxController extends AbstractController
 
             return $this->redirectToRoute('app_sandbox_index', [], Response::HTTP_SEE_OTHER);
         }
-
-
-
-
-
         return $this->render('sandbox/new.html.twig', [
             'sandbox' => $sandbox,
             'form' => $form,
@@ -115,62 +110,75 @@ class SandboxController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sandbox_show', methods: ['GET', 'POST'])]
-    public function show(Sandbox $sandbox, FormFactoryInterface $formFactory, Request $request, EntityManagerInterface $entityManager, Security $security, MailerInterface $mailer): Response
-    {
+    public function show(
+        Sandbox $sandbox,
+        FormFactoryInterface $formFactory,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Security $security,
+        MailerInterface $mailer
+    ): Response {
         $comment = new Comment();
+
+        // Formulaire de commentaire
         $form = $formFactory->create(CommentType::class, $comment, [
             'action' => $this->generateUrl('app_sandbox_show', ['id' => $sandbox->getId()]),
             'method' => 'POST',
         ]);
 
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $security->getUser();
+            $user = $security->getUser(); // Récupération de l'utilisateur connecté
+
             if (!$user) {
-                throw $this->createAccessDeniedException('Vous devez être connecté pour commenter.');
+                $this->addFlash('danger', 'Vous devez être connecté pour commenter.');
+                return $this->redirectToRoute('app_sandbox_show', ['id' => $sandbox->getId()]);
             }
-            $comment->setUsers($user);
+
+            // Liaison des données
+            $comment->setContent($form->get('content')->getData());
+            $comment->setUsers($user); // Associe l'utilisateur au commentaire
             $comment->setSandbox($sandbox);
-            $comment->setCreateAt(new \DateTimeImmutable('now'));
+            $comment->setCreateAt(new \DateTimeImmutable());
+
+// Sauvegarde dans la base de données
             $entityManager->persist($comment);
             $entityManager->flush();
+
+            // Notification des utilisateurs
+            $taggedUsers = $sandbox->getTaggedUsers();
             $email = (new Email())
-                ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
-                ->to($sandbox->getUsers()->getEmail()) // Email de l'utilisateur qui crée la sandbox
-                ->subject('Nouveau commentaire sur votre sandbox')
+                ->from(new Address('contact@app-prod.fr', 'Florajet sandbox'))
+                ->to($user->getEmail()) // Email de l'auteur
+                ->bcc(...array_map(fn($taggedUser) => $taggedUser->getEmail(), $taggedUsers->toArray()))
+                ->subject('Nouveau commentaire sur une sandbox')
                 ->text(sprintf(
-                    "Un nouveau commentaire a été ajouté à votre sandbox :\n\n- Utilisateur : %s\n- Commentaire : %s\n- Date de création : %s",
+                    "Un nouveau commentaire a été ajouté à la sandbox :\n\n- Auteur : %s\n- Contenu : %s\n- Date : %s",
                     $user->getEmail(),
                     $comment->getContent(),
                     $comment->getCreateAt()->format('d/m/Y H:i')
-                ))
-                ->html(sprintf(
-                    '<p>Un nouveau commentaire a été ajouté à votre sandbox :</p>
-                             <ul>
-                                 <li><strong>Utilisateur :</strong> %s</li>
-                                 <li><strong>Commentaire :</strong> %s</li>
-                                 <li><strong>Date de création :</strong> %s</li>
-                             </ul>',
-                    htmlspecialchars($user->getEmail(), ENT_QUOTES),
-                    htmlspecialchars($comment->getContent(), ENT_QUOTES),
-                    htmlspecialchars($comment->getCreateAt()->format('d/m/Y H:i'), ENT_QUOTES)
                 ));
+
             try {
                 $mailer->send($email);
-                $this->addFlash('success', 'Le commentaire a été ajouté et une notification a été envoyée à l\'utilisateur.');
+                $this->addFlash('success', 'Votre commentaire a été ajouté et une notification a été envoyée.');
             } catch (\Exception $e) {
-                $this->addFlash('danger', 'Le commentaire a été ajouté, mais une erreur est survenue lors de l\'envoi de l\'email.');
+                $this->addFlash('danger', 'Votre commentaire a été ajouté, mais une erreur est survenue lors de l\'envoi de l\'email.');
             }
 
-            // Redirigez après soumission
             return $this->redirectToRoute('app_sandbox_show', ['id' => $sandbox->getId()]);
         }
+
+
 
         return $this->render('sandbox/show.html.twig', [
             'sandbox' => $sandbox,
             'commentForm' => $form->createView(),
         ]);
     }
+
+
 
 
     #[Route('/{id}/edit', name: 'app_sandbox_edit', methods: ['GET', 'POST'])]

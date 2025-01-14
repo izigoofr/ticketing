@@ -109,6 +109,10 @@
                                         <p class="m-0">
                                            {{ task.description }}
                                         </p>
+                                        <label class="form-label fw-bold">Lien Gitlab</label>
+                                        <p class="m-0">
+                                            {{ task.gitlab }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -119,8 +123,8 @@
                                     </div>
                                     <div class="card-body py-2 content">
                                         <div class="row g-2 " id="task_comments">
-                                            {% if task.comments is not empty %}
-                                                {% for comment in task.comments %}
+                                            {% if projectComments is not empty %}
+                                                {% for comment in projectComments %}
                                                     <div class="col-12 d-flex gap-2 shadow-sm p-2 rounded-2">
                                                         <img src="{{ asset(comment.user.imagePath != null ? comment.user.imagePath : 'assets/img/avatars/no-avatar.png') }}" class="avatar rounded-circle"/>
                                                         <div class="d-flex flex-column">
@@ -337,7 +341,7 @@
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if(result.isConfirmed){
-                        let url = "{{ path('new_task_comment', {id: task.id}) }}";
+                        let url = "{{ path('new_member_comment', {id: project.id}) }}";
                         $.ajax({
                             url: url,
                             method: 'POST',

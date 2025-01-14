@@ -26,6 +26,9 @@ class TaskComment
     #[ORM\ManyToOne(inversedBy: 'TaskComments')]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $developerMail = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class TaskComment
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeveloperMail(): ?string
+    {
+        return $this->developerMail;
+    }
+
+    public function setDeveloperMail(?string $developerMail): static
+    {
+        $this->developerMail = $developerMail;
 
         return $this;
     }

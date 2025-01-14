@@ -52,6 +52,12 @@ class Task
     #[ORM\Column(nullable: true)]
     private ?int $days = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gitlab = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $developerMail = null;
+
     public function __construct()
     {
         $this->files = new ArrayCollection();
@@ -278,6 +284,30 @@ class Task
     public function setDays(?int $days): static
     {
         $this->days = $days;
+
+        return $this;
+    }
+
+    public function getGitlab(): ?string
+    {
+        return $this->gitlab;
+    }
+
+    public function setGitlab(?string $gitlab): static
+    {
+        $this->gitlab = $gitlab;
+
+        return $this;
+    }
+
+    public function getDeveloperMail(): ?string
+    {
+        return $this->developerMail;
+    }
+
+    public function setDeveloperMail(?string $developerMail): static
+    {
+        $this->developerMail = $developerMail;
 
         return $this;
     }

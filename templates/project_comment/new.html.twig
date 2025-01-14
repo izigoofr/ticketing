@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ProjectComment{% endblock %}
+
+{% block body %}
+    <h1>Create new ProjectComment</h1>
+
+    {{ include('project_comment/_form.html.twig') }}
+
+    <a href="{{ path('app_project_comment_index') }}">back to list</a>
+{% endblock %}
