@@ -13,6 +13,7 @@ use App\Repository\SandboxRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\CustomService;
+use App\Service\SmsGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -89,7 +90,6 @@ class ProjectController extends AbstractController
 
     }
 
-    //show project detail
     #[Route('/projects/{id}/show', name: 'show_project', methods: 'GET')]
     public function show($id) : Response{
         $project = $this->projectRepository->find($id);
@@ -104,24 +104,18 @@ class ProjectController extends AbstractController
         ]);
     }
 
-
     #[Route('/projects/store', name: 'store_project', methods: 'POST')]
     public function store(Request $request): Response
     {
         $client = $this->clientRepository->find($request->get('client_id'));
         $manager = $this->userRepository->find($request->get('manager_id'));
         $team = $this->teamRepository->find($request->get('team_id'));
-
-
-        // Récupération de la sandbox (ou valeur par défaut à null)
         $sandboxId = $request->get('sandboxes');
         $sandbox = $sandboxId ? $this->sandboxRepository->find($sandboxId) : null;
 
         if (!$client || !$manager || !$team) {
             return new Response('Invalid client, manager, or team', Response::HTTP_BAD_REQUEST);
         }
-
-        // Handle tags
         $tags_array = [];
         $tags_json = $request->get('tags');
         if ($tags_json) {
@@ -145,22 +139,16 @@ class ProjectController extends AbstractController
             ->setTeam($team)
             ->setUser($manager)
             ->setClient($client);
-
         $this->manager->persist($project);
-
         foreach ($tags_array as $value) {
             $_tag = new Tag();
             $_tag->setName($value);
             $_tag->setProject($project);
             $this->manager->persist($_tag);
         }
-
         $this->manager->flush();
-
         return new Response('created');
     }
-
-
 
 
     #[Route('/projects/update/{id}', name: 'update_project', methods: 'POST')]
@@ -241,11 +229,30 @@ class ProjectController extends AbstractController
             $this->manager->remove($row);
         }
         $this->manager->flush();
-
         $this->manager->remove($project);
         $this->manager->flush();
         return new Response('deleted');
     }
+
+    #[Route('/sendSms', name: 'send_sms', methods: ['GET'])]
+    public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
+    {
+        $projectId = $request->query->get('id'); // Récupère l'id du projet depuis la requête
+
+        if (!$projectId) {
+            throw $this->createNotFoundException('No project ID provided.');
+        }
+
+        // Logique d'envoi du SMS ici
+        $smsGenerator->sendSmsToProjectUser($projectId);
+
+        // Retourne une vue ou un JSON
+        return $this->render('sms/index.html.twig', [
+            'smsSent' => true,
+            'projectId' => $projectId,
+        ]);
+    }
+
 
 
 }

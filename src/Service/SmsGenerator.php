@@ -35,6 +35,17 @@ class SmsGenerator
 
 
     }
+
+    public function sendSmsToProjectUser(float|bool|int|string|null $projectId)
+    {
+        // Logique d'envoi du SMS ici
+        // Récupère le numéro de téléphone de l'utilisateur du projet
+        $phoneNumber = '+33668435344'; // Remplacer par le numéro de téléphone de l'utilisateur du projet
+        $name = 'John Doe'; // Remplacer par le nom de l'utilisateur du projet
+        $text = 'Bonjour, vous avez reçu un nouveau message sur le projet #'.$projectId.'.'; // Message à envoyer
+        $this->SendSms($phoneNumber, $name, $text);
+
+    }
 }
 
 

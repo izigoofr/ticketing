@@ -85,6 +85,7 @@
 					<div class="col d-flex gap-2 justify-content-end">
 						<button type="button"  class="btn btn-secondary back_btn">Back</button>
 						<button type="submit" class="btn btn-primary save_btn" data-id="{{ project.id }}">Save</button>
+						<button type="submit" class="btn btn-info send_btn" data-id="{{ project.id }}">Send</button>
 					</div>
 				</div>
 			</div>
@@ -184,5 +185,14 @@
                 })
             })
         </script>
+       <script>
+    $(document).ready(function () {
+        $(".send_btn").click(function () {
+            let projectId = $(this).data("id"); // Récupère l'id du projet
+            let url = "{{ path('send_sms') }}?id=" + projectId; // Génère l'URL avec un paramètre
+            window.location.href = url; // Redirige vers l'URL
+        });
+    });
+</script>
     {% endblock %}
 {% endblock %}

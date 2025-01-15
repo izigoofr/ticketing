@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Repository\UserRepository;
 use App\Service\SmsGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,23 +16,26 @@ class SmsController extends AbstractController
     public function index(): Response
     {
 
+
         return $this->render('sms/index.html.twig',['smsSent'=>false]);
     }
-    #[Route('/sendSms', name: 'send_sms', methods:'POST')]
+    #[Route('/sendSms', name: 'send_sms', methods: ['GET'])]
     public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
     {
+        $projectId = $request->query->get('id'); // Récupère l'id du projet depuis la requête
 
-        $number=$request->request->get('number');
+        if (!$projectId) {
+            throw $this->createNotFoundException('No project ID provided.');
+        }
 
-        $name=$request->request->get('name');
+        // Logique d'envoi du SMS ici
+        $smsGenerator->sendSmsToProjectUser($projectId);
 
-        $text=$request->request->get('text');
-
-       // $number_test=$_ENV['twilio_to_number'];// Numéro vérifier par twilio. Un seul numéro autorisé pour la version de test.
-
-        //Appel du service
-        $smsGenerator->sendSms($number ,$name,$text);
-
-        return $this->render('sms/index.html.twig', ['smsSent'=>true]);
+        // Retourne une vue ou un JSON
+        return $this->render('sms/index.html.twig', [
+            'smsSent' => true,
+            'projectId' => $projectId,
+        ]);
     }
+
 }
