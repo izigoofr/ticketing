@@ -53,7 +53,8 @@ class ProjectController extends AbstractController
             $project_list = $this->projectRepository->findAll();
         }
         return $this->render('project/index.html.twig', [
-            'project_list' => $project_list
+            'project_list' => $project_list,
+            'smsSent' => true,
         ]);
     }
 
@@ -248,7 +249,7 @@ class ProjectController extends AbstractController
 
         // Retourne une vue ou un JSON
         return $this->render('project/index.html.twig', [
-            'smsSent' => true,
+
             'projectId' => $projectId,
         ]);
     }
