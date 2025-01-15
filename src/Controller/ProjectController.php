@@ -235,7 +235,7 @@ class ProjectController extends AbstractController
         return new Response('deleted');
     }
 
-    #[Route('/sendSms', name: 'send_sms', methods: ['GET'])]
+    #[Route('/sendSmsManger', name: 'send_sms_manger', methods: ['GET'])]
     public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
     {
         $projectId = $request->query->get('id'); // Récupère l'id du projet depuis la requête

@@ -189,7 +189,7 @@
     $(document).ready(function () {
         $(".send_btn").click(function () {
             let projectId = $(this).data("id"); // Récupère l'id du projet
-            let url = "{{ path('send_sms') }}?id=" + projectId; // Génère l'URL avec un paramètre
+            let url = "{{ path('send_sms_manger') }}?id=" + projectId; // Génère l'URL avec un paramètre
             window.location.href = url; // Redirige vers l'URL
         });
     });
