@@ -247,7 +247,7 @@ class ProjectController extends AbstractController
         $smsGenerator->sendSmsToProjectUser($projectId);
 
         // Retourne une vue ou un JSON
-        return $this->render('sms/index.html.twig', [
+        return $this->render('project/index.html.twig', [
             'smsSent' => true,
             'projectId' => $projectId,
         ]);

@@ -12,12 +12,12 @@
         color: red;
     }
 </style>
-
-
-
 	<h4 class="fw-bold py-3 mb-4">
 		Request Management
 	</h4>
+    {% if smsSent %}
+        <div class="alert alert-success mt-3 text-center">Le SMS a été envoyé avec succès.</div>
+    {% endif %}
 	<a href="{{ path('create_project') }}" class="btn btn-success mb-3">add new request</a>
 	<div class="card">
 		<h5 class="card-header">List Of Projects</h5>
