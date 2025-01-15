@@ -249,7 +249,7 @@ class ProjectController extends AbstractController
 
         // Retourne une vue ou un JSON
         return $this->render('project/index.html.twig', [
-
+            'smsSent' => true,
 
         ]);
     }
