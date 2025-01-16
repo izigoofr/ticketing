@@ -41,8 +41,6 @@ class ApplicantController extends AbstractController
     #[Route('/', name: 'applicant', methods: ['GET'])]
     public function index(ProjectRepository $projectRepository): Response
     {
-
-// recuperer les projets de l'utilisateur connecté par rapport à son applicant
         $projects = $projectRepository->findBy(['applicant' => $this->getUser()->getFirstName()]);
 
         return $this->render('applicant/index.html.twig', [

@@ -10,21 +10,12 @@ class SmsGenerator
     public function SendSms(string $number, string $name, string $text)
     {
 
-
-
-
-
-
         $accountSid = $_ENV['twilio_account_sid'];  //Identifiant du compte twilio
         $authToken = $_ENV['twilio_auth_token']; //Token d'authentification
         $fromNumber = $_ENV['twilio_from_number']; // Numéro de test d'envoie sms offert par twilio
-
         $toNumber = $number; // Le numéro de la personne qui reçoit le message
         $message = ''.$name.' vous a envoyé le message suivant:'.' '.$text.''; //Contruction du sms
-
-        //Client Twilio pour la création et l'envoie du sms
         $client = new Client($accountSid, $authToken);
-
         $client->messages->create(
             $toNumber,
             [
@@ -38,8 +29,7 @@ class SmsGenerator
 
     public function sendSmsToProjectUser(float|bool|int|string|null $projectId)
     {
-        // Logique d'envoi du SMS ici
-        // Récupère le numéro de téléphone de l'utilisateur du projet
+
         $phoneNumber = '+33668435344'; // Remplacer par le numéro de téléphone de l'utilisateur du projet
         $name = 'John Doe'; // Remplacer par le nom de l'utilisateur du projet
         $text = 'Bonjour, vous avez reçu un nouveau message sur le projet #'.$projectId.'.'; // Message à envoyer

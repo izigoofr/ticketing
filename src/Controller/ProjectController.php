@@ -127,7 +127,6 @@ class ProjectController extends AbstractController
             $tags_array = array_map(fn($tag) => $tag['value'] ?? null, $tags_array);
             $tags_array = array_filter($tags_array);
         }
-
         $project = new Project();
         $project->setTitle($request->get('title'))
             ->setContent($request->get('content'))
