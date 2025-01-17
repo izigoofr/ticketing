@@ -130,6 +130,7 @@ class ProjectController extends AbstractController
         $project = new Project();
         $project->setTitle($request->get('title'))
             ->setContent($request->get('content'))
+            ->setAttachment($request->get('attachment'))
             ->setDeadLine($request->get('deadline'))
             ->setPriority($request->get('priority'))
             ->setApplicant($request->get('applicant'))
