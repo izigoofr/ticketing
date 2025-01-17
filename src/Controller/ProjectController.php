@@ -159,7 +159,7 @@ class ProjectController extends AbstractController
         $project = new Project();
         $project->setTitle($request->get('title'))
             ->setContent($request->get('content'))
-            ->setAttachment($request->get('attachment')) // Enregistrer le chemin du fichier
+            ->setAttachment($uploadedFilePath) // Enregistrer le chemin du fichier
             ->setDeadLine($request->get('deadline'))
             ->setPriority($request->get('priority'))
             ->setApplicant($request->get('applicant'))
@@ -170,7 +170,6 @@ class ProjectController extends AbstractController
             ->setUser($manager)
             ->setClient($client);
         $this->manager->persist($project);
-
 
         // Ajouter les tags
         foreach ($tags_array as $value) {
