@@ -171,6 +171,7 @@ class ProjectController extends AbstractController
             ->setClient($client);
         $this->manager->persist($project);
 
+
         // Ajouter les tags
         foreach ($tags_array as $value) {
             $_tag = new Tag();
