@@ -169,7 +169,7 @@ class ProjectController extends AbstractController
             ->setTeam($team)
             ->setUser($manager)
             ->setClient($client);
-
+dump($project);
         $this->manager->persist($project);
 
         // Ajouter les tags
