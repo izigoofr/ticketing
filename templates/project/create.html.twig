@@ -14,11 +14,12 @@
 						<label for="title" class="form-label">Name title</label>
 						<input type="text" class="form-control" placeholder="Enter name" name="title" id="title">
 					</div>
-					<div class="col-12">
-						<label for="attachment" class="form-label">Attachment</label>
-						<input type="text" class="form-control" placeholder="Enter name" name="attachment" id="attachment">
-					</div>
-				</div>
+                    <div class="col-12">
+                        <label for="attachment" class="form-label">Attachment</label>
+                        <input type="file" class="form-control" name="attachment" id="attachment">
+                    </div>
+
+                </div>
                 <div class="row g-3 mb-3">
 					<div class="col-12">
                      <label for="contact_info" class="form-label">Detail action</label>
@@ -141,7 +142,6 @@
                         $("#client_id"),
                         $("#deadline"),
                         $("#priority"),
-                        $("#tags"),
                         $("#applicant"),
                         $("#manager_id"),
                         $("#team_id")
