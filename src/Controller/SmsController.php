@@ -6,6 +6,8 @@ use App\Service\SmsGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SmsController extends AbstractController
@@ -18,23 +20,36 @@ class SmsController extends AbstractController
     }
 
     //Gestion de l'envoie du sms
-    #[Route('/sendSms', name: 'send_sms', methods:'POST')]
-    public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
+    #[Route('/sendSms', name: 'send_sms', methods: ['POST', 'GET'])]
+    public function sendSms(Request $request, TexterInterface $texter): Response
     {
+        $smsSent = false;
 
-        $number=$request->request->get('number');
+        if ($request->isMethod('POST')) {
+            // Récupérer les données du formulaire
+            $phoneNumber = $request->request->get('number');
+            $senderName = $request->request->get('name');
+            $messageText = $request->request->get('text');
 
-        $name=$request->request->get('name');
+            try {
+                // Créer et envoyer le message SMS
+                $sms = new SmsMessage(
+                    $phoneNumber,
+                    $messageText,
+                    $senderName
+                );
 
-        $text=$request->request->get('text');
+                $texter->send($sms);
+                $smsSent = true;
+            } catch (\Exception $e) {
+                // Gérer les erreurs ici
+                $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
+            }
+        }
 
-        $number_test=$_ENV['twilio_to_number'];// Numéro vérifier par twilio. Un seul numéro autorisé pour la version de test.
-
-        //Appel du service
-        $smsGenerator->sendSms($number_test ,$name,$text);
-
-        return $this->render('sms/index.html.twig', ['smsSent'=>true]);
+        return $this->render('sms/index.html.twig', ['smsSent' => $smsSent]);
     }
+
 
 
 

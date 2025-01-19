@@ -7,6 +7,7 @@
         "php": ">=8.0.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "ext-openssl": "*",
         "api-platform/core": "^2.7",
         "babdev/pagerfanta-bundle": "^4.4",
@@ -29,6 +30,7 @@
         "sendgrid/sendgrid": "~7",
         "symfony/asset": "6.4.*",
         "symfony/brevo-mailer": "6.4.*",
+        "symfony/brevo-notifier": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/doctrine-messenger": "6.4.*",
         "symfony/dotenv": "6.4.*",
@@ -62,8 +64,7 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
         "twilio/sdk": "^8.3",
-        "webonyx/graphql-php": "^15.12",
-        "ext-intl": "*"
+        "webonyx/graphql-php": "^15.12"
     },
     "config": {
         "allow-plugins": {
