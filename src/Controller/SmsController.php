@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SmsController extends AbstractController
 {
-    #[Route('/sms', name: 'app_sms')]
+    #[Route('/sms', name: 'sms')]
     public function index(): Response
     {
         return $this->render('sms/index.html.twig',['smsSent'=>false]);
