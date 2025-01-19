@@ -20,13 +20,9 @@ class SmsController extends AbstractController
         return $this->render('sms/index.html.twig',['smsSent'=>false]);
     }
 
-    //Gestion de l'envoie du sms
     #[Route('/sendSms', name: 'send_sms', methods: ['POST', 'GET'])]
     public function sendSms(Request $request, TexterInterface $texter): Response
     {
-        $smsSent = false;
-        $phoneNumber = null;
-
         if ($request->isMethod('POST')) {
             $phoneNumber = $request->request->get('number');
             $messageText = $request->request->get('text');
@@ -39,19 +35,19 @@ class SmsController extends AbstractController
                 );
 
                 $texter->send($sms);
-                $smsSent = true;
 
-                // Message de succès
+                // Ajouter un message flash de succès
                 $this->addFlash('success', "Le SMS a été envoyé avec succès au numéro : $phoneNumber");
+
+                // Redirection vers la même page (ou une autre si besoin)
+                return $this->redirectToRoute('send_sms');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
             }
         }
 
-        return $this->render('sms/index.html.twig', [
-            'smsSent' => $smsSent,
-            'phoneNumber' => $phoneNumber,
-        ]);
+        return $this->render('sms/index.html.twig');
     }
+
 
 }
