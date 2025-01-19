@@ -19,46 +19,22 @@ class SmsController extends AbstractController
     #[Route('/sendSms', name: 'send_sms', methods: ['GET'])]
     public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
     {
-        $projectId = $request->query->get('id'); // Récupère l'id du projet depuis la requête
-        if (!$projectId) {
-            throw $this->createNotFoundException('No project ID provided.');
-        }
-        $smsGenerator->sendSmsToProjectUser($projectId);
-        return $this->render('sms/index.html.twig', [
-            'smsSent' => true,
-            'projectId' => $projectId,
-        ]);
+        $number=$request->request->get('number');
+
+        $name=$request->request->get('name');
+
+        $text=$request->request->get('text');
+
+        $number_test=$_ENV['twilio_to_number'];// Numéro vérifier par twilio. Un seul numéro autorisé pour la version de test.
+
+        //Appel du service
+        $smsGenerator->sendSms($number_test ,$name,$text);
+
+        return $this->render('sms/index.html.twig', ['smsSent'=>true]);
     }
 
-    // envoyer des sms librement
-    #[Route('/sendSmsToUser', name: 'send_sms_to_user', methods: ['POST'])]
-    public function sendSmsToUser(Request $request, SmsGenerator $smsGenerator): Response
-    {
-        $phoneNumber = $request->request->get('phoneNumber'); // Utiliser POST pour plus de sécurité
-        $name = $request->request->get('name');
-        $text = $request->request->get('text');
 
-        if (!$phoneNumber || !$name || !$text) {
-            throw $this->createNotFoundException('Missing parameters.');
-        }
 
-        try {
-            $smsGenerator->sendSmsToUser($phoneNumber, $name, $text);
-            $smsSent = true;
-        } catch (\Exception $e) {
-            // Gérer l'erreur et afficher un message à l'utilisateur
-            $smsSent = false;
-            $errorMessage = $e->getMessage();
-        }
-
-        return $this->render('sms/index.html.twig', [
-            'smsSent' => $smsSent,
-            'phoneNumber' => $phoneNumber,
-            'name' => $name,
-            'text' => $text,
-            'errorMessage' => $errorMessage ?? null,
-        ]);
-    }
 
 
 }
