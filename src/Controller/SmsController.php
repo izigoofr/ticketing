@@ -10,15 +10,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SmsController extends AbstractController
 {
-    #[Route('/sms', name: 'sms')]
+    //La vue du formulaire d'envoie du sms
+    #[Route('/', name: 'app_sms_index')]
     public function index(): Response
     {
         return $this->render('sms/index.html.twig',['smsSent'=>false]);
     }
 
-    #[Route('/sendSms', name: 'send_sms', methods: ['GET'])]
+    //Gestion de l'envoie du sms
+    #[Route('/sendSms', name: 'send_sms', methods:'POST')]
     public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
     {
+
         $number=$request->request->get('number');
 
         $name=$request->request->get('name');
@@ -32,6 +35,7 @@ class SmsController extends AbstractController
 
         return $this->render('sms/index.html.twig', ['smsSent'=>true]);
     }
+
 
 
 
