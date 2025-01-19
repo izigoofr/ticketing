@@ -37,10 +37,29 @@ class SmsGenerator
 
     }
 
-    // envoyer des sms
-    public function sendSmsToUser(string $phoneNumber, string $name, string $text)
+
+    public function sendSmsToUser(string $phoneNumber, string $name, string $text): void
     {
-        $this->SendSms($phoneNumber, $name, $text);
+        try {
+            $this->SendSmsUser($phoneNumber, $name, $text); // Supposons que cette méthode envoie le SMS
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to send SMS: ' . $e->getMessage());
+        }
+    }
+
+// Exemple d'implémentation fictive de la méthode SendSms
+    private function SendSmsUser(string $phoneNumber, string $name, string $text): void
+    {
+        // Utiliser une API comme Twilio, Vonage, ou une autre
+        // Exemple simplifié avec un message de simulation
+        if (empty($phoneNumber) || empty($text)) {
+            throw new \InvalidArgumentException('Invalid phone number or text.');
+        }
+
+        // Exemple : appel API fictive
+        // $apiResponse = $this->smsProvider->send($phoneNumber, $text);
+
+        // Simuler une réussite pour l'exemple
     }
 
 }
