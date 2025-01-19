@@ -7,7 +7,7 @@ use Twilio\Rest\Client;
 class SmsGenerator
 {
 
-    public function SendSms(string $number, string $name, string $text)
+    public function SendSms(string $number, string $name, string $text): void
     {
 
         $accountSid = $_ENV['twilio_account_sid'];  //Identifiant du compte twilio
