@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class SmsController extends AbstractController
 {
     //La vue du formulaire d'envoie du sms
-    #[Route('/', name: 'app_sms_index')]
+    #[Route('/sms', name: 'app_sms_index')]
     public function index(): Response
     {
         return $this->render('sms/index.html.twig',['smsSent'=>false]);
