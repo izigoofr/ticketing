@@ -5,7 +5,7 @@
 		<span class="text-muted">Projects Management /</span>
 		Create a project
 	</h4>
-	<form action="" method="post" id="new_project_form" enctype="multipart/form-data">
+	<form action="{{ path('store_project') }}" method="post" id="new_project_form" enctype="multipart/form-data">
 		<div class="card">
 			<h5 class="card-header">Fill these informations</h5>
 			<div class="card-body pt-4">
@@ -121,88 +121,5 @@
     <!--tagify path-->
     <script src="{{ asset('assets/js/tagify.min.js') }}"></script>
     <!-- tags input handler -->
-    {% block javascript %}
-        <script>
-            //set active page
-            $('#projects').toggleClass('active');
-        </script>
-        <script>
-            let tags = document.querySelector('input[name=tags]');
-            new Tagify(tags);
-        </script>
-        <!-- form validatoin -->
-        <script>
-            $(document).ready(function(){
-                $("#new_project_form").submit(function (event) {
-                    event.preventDefault();
-                    let fields = [
-                        $("#title"),
-                        $("#startdate"),
-                        $("#client_id"),
-                        $("#deadline"),
-                        $("#priority"),
-                        $("#applicant"),
-                        $("#manager_id"),
-                        $("#team_id")
-                    ];
 
-                    let isValid = true;
-
-                    fields.forEach(field => {
-                        if (field.val() === "") {
-                            field.addClass("error");
-                            isValid = false;
-                        } else {
-                            field.removeClass("error");
-                        }
-                    });
-
-                    if(isValid){
-                        let url = "{{ path('store_project') }}";
-                        $.ajax({
-                            url: url,
-                            method: 'POST',
-                            data: $(this).serialize()
-                        }).then((response) => {
-                            if(response == 'created'){
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Added',
-                                    text: 'The project has been created.',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'OK'
-                                }).then(function(){
-                                    window.location.href = '/projects';
-                                });
-                            }
-                        }).fail(function(){
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'An error occurred.',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'OK'
-                            });
-                        })
-                    }
-
-                })
-                $("#reset").click(function () {
-                    let fields = [
-                        $("#title"),
-                        $("#client_id"),
-                        $("#deadline"),
-                        $("#priority"),
-                        $("#tags"),
-                        $("#applicant"),
-                        $("#manager_id"),
-                        $("#team_id")
-                    ];
-                    fields.forEach(fields => {
-                        fields.removeClass("error");
-                    })
-                })
-            })
-        </script>
-    {% endblock %}
 {% endblock %}

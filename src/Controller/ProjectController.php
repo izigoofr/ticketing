@@ -132,13 +132,34 @@ class ProjectController extends AbstractController
 
         // Gestion du fichier uploadé
         $uploadedFile = $request->files->get('attachment');
+        $uploadedFilePath = null;
 
+        if ($uploadedFile) {
+            // Valider le fichier (optionnel)
+            if (!$uploadedFile->isValid()) {
+                return new Response('Invalid file upload', Response::HTTP_BAD_REQUEST);
+            }
+
+            // Récupérer le chemin d'upload depuis les paramètres
+            $uploadsDirectory = $this->getParameter('uploads_directory');
+            $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+
+            // Déplacer le fichier dans le répertoire configuré
+            try {
+                $uploadedFile->move($uploadsDirectory, $newFilename);
+                $uploadedFilePath = $newFilename; // Chemin public
+            } catch (\Exception $e) {
+                return new Response('Failed to upload file: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
 
         // Créer le projet
         $project = new Project();
         $project->setTitle($request->get('title'))
             ->setContent($request->get('content'))
-            ->setAttachment($uploadedFile) // Enregistrer le chemin du fichier
+            ->setAttachment($uploadedFilePath) // Enregistrer le chemin du fichier
             ->setDeadLine($request->get('deadline'))
             ->setPriority($request->get('priority'))
             ->setApplicant($request->get('applicant'))
@@ -148,6 +169,7 @@ class ProjectController extends AbstractController
             ->setTeam($team)
             ->setUser($manager)
             ->setClient($client);
+
         $this->manager->persist($project);
 
         // Ajouter les tags
@@ -160,8 +182,9 @@ class ProjectController extends AbstractController
 
         $this->manager->flush();
 
-        return new Response('created');
+       return $this->redirect($this->generateUrl('project_list'));
     }
+
 
 
 

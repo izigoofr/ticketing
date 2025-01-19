@@ -36,6 +36,13 @@ class SmsGenerator
         $this->SendSms($phoneNumber, $name, $text);
 
     }
+
+    // envoyer des sms
+    public function sendSmsToUser(string $phoneNumber, string $name, string $text)
+    {
+        $this->SendSms($phoneNumber, $name, $text);
+    }
+
 }
 
 

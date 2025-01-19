@@ -30,4 +30,23 @@ class SmsController extends AbstractController
         ]);
     }
 
+    // envoyer des sms librement
+    #[Route('/sendSmsToUser', name: 'send_sms_to_user', methods: ['GET'])]
+    public function sendSmsToUser(Request $request, SmsGenerator $smsGenerator): Response
+    {
+        $phoneNumber = $request->query->get('phoneNumber'); // Récupère le numéro de téléphone depuis la requête
+        $name = $request->query->get('name'); // Récupère le nom depuis la requête
+        $text = $request->query->get('text'); // Récupère le message depuis la requête
+        if (!$phoneNumber || !$name || !$text) {
+            throw $this->createNotFoundException('Missing parameters.');
+        }
+        $smsGenerator->sendSmsToUser($phoneNumber, $name, $text);
+        return $this->render('sms/index.html.twig', [
+            'smsSent' => true,
+            'phoneNumber' => $phoneNumber,
+            'name' => $name,
+            'text' => $text,
+        ]);
+    }
+
 }
