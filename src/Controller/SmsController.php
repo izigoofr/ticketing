@@ -26,29 +26,25 @@ class SmsController extends AbstractController
         $smsSent = false;
 
         if ($request->isMethod('POST')) {
-            // Récupérer les données du formulaire
             $phoneNumber = $request->request->get('number');
-            $senderName = $request->request->get('name');
             $messageText = $request->request->get('text');
 
             try {
-                // Créer et envoyer le message SMS
                 $sms = new SmsMessage(
                     $phoneNumber,
-                    $messageText,
-                    $senderName
+                    $messageText
                 );
 
                 $texter->send($sms);
                 $smsSent = true;
             } catch (\Exception $e) {
-                // Gérer les erreurs ici
                 $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
             }
         }
 
         return $this->render('sms/index.html.twig', ['smsSent' => $smsSent]);
     }
+
 
 
 

@@ -1,8 +1,8 @@
-# config/packages/notifier.yaml
 framework:
     notifier:
         texter_transports:
-            twilio: '%env(TWILIO_DSN)%'
+            brevo: '%env(BREVO_SMS_DSN)%'
+
         channel_policy:
             # use chat/slack, chat/telegram, sms/twilio or sms/nexmo
             urgent: ['email']
