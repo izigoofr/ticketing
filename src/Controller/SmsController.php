@@ -44,12 +44,4 @@ class SmsController extends AbstractController
 
         return $this->render('sms/index.html.twig', ['smsSent' => $smsSent]);
     }
-
-
-
-
-
-
-
-
 }
