@@ -1,9 +1,6 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Project index{% endblock %}
-
 {% block content %}
-
     <h1>Request - Ticketing</h1>
     {% for type, messages in app.flashes %}
         <div class="alert alert-{{ type }}" role="alert">
@@ -100,6 +97,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-
 {% endblock %}
