@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
-
 {% block content %}
-
     {% set taskCounts = {} %}
 	{% for day in last7days %}
 		{% set tasks = task_list|filter(task => task.status == 'Finished' and task.enddate|date('Y-m-d') == day) %}

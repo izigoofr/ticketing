@@ -1,4 +1,3 @@
-
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 	<div class="app-brand demo">
 		<a href="{{ path('dashboard') }}" class="app-brand-link d-flex gap-1">
@@ -7,16 +6,12 @@
 			</span>
 			<span class="fs-4 demo menu-text fw-bolder ms-2">Florajet</span>
 		</a>
-
 		<a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
 			<i class="bx bx-chevron-left bx-sm align-middle"></i>
 		</a>
 	</div>
-
 	<div class="menu-inner-shadow"></div>
-
-	<ul
-		class="menu-inner py-1">
+	<ul class="menu-inner py-1">
 		<!-- Dashboard -->
 		<li class="menu-item"  id="dashboard">
 			<a href="{{ path('dashboard') }}" class="menu-link">
@@ -24,59 +19,48 @@
 				<div data-i18n="Analytics">Dashboard</div>
 			</a>
 		</li>
-
-
-
     <li class="menu-item" id="members">
         <a href="{{ path('member_list') }}" class="menu-link">
             <i class='menu-icon bx bx-user'></i>
             <div data-i18n="Members">Members</div>
         </a>
     </li>
-
     <li class="menu-item" id="teams">
         <a href="{{ path('team_list') }}" class="menu-link">
             <i class='menu-icon bx bx-group'></i>
             <div data-i18n="Members">Teams</div>
         </a>
     </li>
-
     <li class="menu-item" id="clients">
         <a href="{{ path('client_list') }}" class="menu-link">
             <i class='menu-icon bx bx-user-pin'></i>
             <div data-i18n="Members">Services</div>
         </a>
     </li>
-
 		<li class="menu-item" id="projects">
 			<a href="{{ path('project_list') }}" class="menu-link">
 				<i class='menu-icon bx bx-network-chart'></i>
 				<div data-i18n="Projects">Project</div>
 			</a>
 		</li>
-
 		<li class="menu-item" id="projects">
 			<a href="{{ path('app_sms_index') }}" class="menu-link">
 				<i class='menu-icon bx bx-message'></i>
 				<div data-i18n="Projects">Sms</div>
 			</a>
 		</li>
-
 		<li class="menu-item" id="request">
 			<a href="{{ path('app_applicant_new') }}" class="menu-link">
 				<i class='menu-icon  bx bx-chat'></i>
 				<div data-i18n="Projects">Ticketing</div>
 			</a>
 		</li>
-
 		<li class="menu-item" id="request">
 			<a href="{{ path('app_sandbox_index') }}" class="menu-link">
 				<i class='menu-icon bx bx-cube'></i>
 				<div data-i18n="Sandbox">Sandbox</div>
-
 			</a>
 		</li>
-
 		<li class="menu-item" id="request">
 			<a href="{{ path('app_inventory') }}" class="menu-link">
 				<i class='menu-icon   bx bx-bar-chart-alt-2'></i>
@@ -84,5 +68,4 @@
 			</a>
 		</li>
 	</ul>
-
 </aside>
