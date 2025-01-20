@@ -30,7 +30,7 @@ class SmsController extends AbstractController
                 $sms = new SmsMessage(
                     $phoneNumber,
                     $messageText,
-                    'Florajet'
+                    'SI-Florajet'
                 );
                 $texter->send($sms);
                 $smsSent = true;

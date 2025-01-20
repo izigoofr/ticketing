@@ -118,7 +118,6 @@ class ProjectController extends AbstractController
             return new Response('Invalid client, manager, or team', Response::HTTP_BAD_REQUEST);
         }
 
-        // Gestion des tags
         $tags_array = [];
         $tags_json = $request->get('tags');
         if ($tags_json) {
@@ -130,7 +129,6 @@ class ProjectController extends AbstractController
             $tags_array = array_filter($tags_array);
         }
 
-        // Gestion du fichier uploadé
         $uploadedFile = $request->files->get('attachment');
         $uploadedFilePath = null;
 
@@ -145,8 +143,6 @@ class ProjectController extends AbstractController
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalFilename);
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
-
-            // Déplacer le fichier dans le répertoire configuré
             try {
                 $uploadedFile->move($uploadsDirectory, $newFilename);
                 $uploadedFilePath = $newFilename; // Chemin public
@@ -154,8 +150,6 @@ class ProjectController extends AbstractController
                 return new Response('Failed to upload file: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
-
-        // Créer le projet
         $project = new Project();
         $project->setTitle($request->get('title'))
             ->setContent($request->get('content'))
@@ -169,58 +163,43 @@ class ProjectController extends AbstractController
             ->setTeam($team)
             ->setUser($manager)
             ->setClient($client);
-
         $this->manager->persist($project);
-
-        // Ajouter les tags
         foreach ($tags_array as $value) {
             $_tag = new Tag();
             $_tag->setName($value);
             $_tag->setProject($project);
             $this->manager->persist($_tag);
         }
-
         $this->manager->flush();
-
        return $this->redirect($this->generateUrl('project_list'));
     }
 
 
-
-
     #[Route('/projects/update/{id}', name: 'update_project', methods: 'POST')]
     public function update(Request $request, $id, CustomService $customService) : Response{
-        //get project
         $project = $this->projectRepository->find($id);
-        //get client
         $client = $this->clientRepository->find($request->get('client_id'));
-        //get manager
         $manager = $this->userRepository->find($request->get('manager_id'));
-        //get team
         $team = $this->teamRepository->find($request->get('team_id'));
-        //convert tags to array
         $tags_string = $request->get('tags');
         $tags_string = str_replace(['{', '}', '[', ']', ':', 'value', '"'], '', $tags_string);
         $tags_array = explode(',', $tags_string);
         $tags_array = array_map('trim', $tags_array);
-
-        //delete old tags from tag table
         $tags = $this->manager->getRepository(Tag::class)->findBy(['project' => $id]);
         foreach($tags as $tag){
             $tag->setProject(null);
         }
         $this->manager->flush();
         $customService->deleteUnusedTags();
-        //store new tags
         foreach($tags_array as $key => $value){
             $_tag = new Tag();
             $_tag->setName($value);
             $_tag->setProject($project);
             $this->manager->persist($_tag);
         }
-        //update project data
         $project->setTitle($request->get('title'))
                 ->setDeadLine($request->get('deadline'))
+                ->setPriority($request->get('priority'))
                 ->setTeam($team)
                 ->setUser($manager)
                 ->setClient($client);
@@ -230,7 +209,6 @@ class ProjectController extends AbstractController
 
     #[Route('/projects/destroy/{id}', name: 'destroy_project', methods: 'POST')]
     public function destroy($id) : Response{
-        //deleting tags associeted with the project
         $tags = $this->manager->getRepository(Tag::class)->findBy(['project' => $id]);
         foreach($tags as $tag){
             $this->manager->remove($tag);
@@ -275,18 +253,10 @@ class ProjectController extends AbstractController
     public function sendSms(Request $request, SmsGenerator $smsGenerator): Response
     {
         $projectId = $request->query->get('id'); // Récupère l'id du projet depuis la requête
-
         if (!$projectId) {
             throw $this->createNotFoundException('No project ID provided.');
         }
-
-        // Logique d'envoi du SMS ici
         $smsGenerator->sendSmsToProjectUser($projectId);
-
-        // Retourne une vue ou un JSON
         return $this->redirectToRoute('project_list');
     }
-
-
-
 }
