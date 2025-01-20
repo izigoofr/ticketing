@@ -113,7 +113,6 @@ class ProfileController extends AbstractController
         return $this->render('profile/security.html.twig');
     }
 
-
     #[Route('/profile/security/update-password', name: 'profile_update_password', methods: 'POST')]
     public function updatePassword(Request $request, Security $security, UserPasswordHasherInterface $userPasswordHasherInterface){
         $oldPassword = $request->get('oldPassword');
@@ -128,5 +127,4 @@ class ProfileController extends AbstractController
             return new Response('echec');
         }
     }
-
 }

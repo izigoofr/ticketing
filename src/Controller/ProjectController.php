@@ -88,7 +88,6 @@ class ProjectController extends AbstractController
             'clients' => $clients,
             'managers' => $users
         ]);
-
     }
 
     #[Route('/projects/{id}/show', name: 'show_project', methods: 'GET')]
@@ -133,12 +132,9 @@ class ProjectController extends AbstractController
         $uploadedFilePath = null;
 
         if ($uploadedFile) {
-            // Valider le fichier (optionnel)
             if (!$uploadedFile->isValid()) {
                 return new Response('Invalid file upload', Response::HTTP_BAD_REQUEST);
             }
-
-            // Récupérer le chemin d'upload depuis les paramètres
             $uploadsDirectory = $this->getParameter('uploads_directory');
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalFilename);
@@ -256,7 +252,6 @@ class ProjectController extends AbstractController
         if (!$projectId) {
             throw $this->createNotFoundException('No project ID provided.');
         }
-        // $smsGenerator->sendSmsToProjectUser($projectId);
         return $this->redirectToRoute('project_list');
     }
 }

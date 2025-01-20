@@ -61,10 +61,8 @@ class ApplicantController extends AbstractController
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour effectuer cette action.');
         }
-
         $project = new Project();
         $project->setUser($user);
-
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
 
@@ -73,19 +71,14 @@ class ApplicantController extends AbstractController
             if (!$team) {
                 throw $this->createNotFoundException('L\'équipe par défaut avec l\'ID 1 n\'existe pas.');
             }
-
             $project->setTeam($team);
             $project->setStatus('Not Started Yet');
-            // recuperer le email du user connecter
             $project->setMailApplicant($user->getEmail());
             $project->setPriority(1);
-
-            // Récupérer le prénom de l'utilisateur
             $project->setApplicant($user->getFirstName());
 
             /** @var UploadedFile $uploadedFile */
             $uploadedFile = $form->get('attachment')->getData();
-
 
             if ($uploadedFile) {
                 $uploadsDirectory = $this->getParameter('uploads_directory');
@@ -100,7 +93,6 @@ class ApplicantController extends AbstractController
             }
             $entityManager->persist($project);
             $entityManager->flush();
-            // Envoi d'email
             $email = (new Email())
                 ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
                 ->to('f.stoessel@florajet.com') // Liste d'adresses
@@ -126,7 +118,6 @@ class ApplicantController extends AbstractController
             elseif ($this->isGranted('ROLE_APPLICANT')) {
                 return $this->redirectToRoute('applicant');
             }
-
         }
         return $this->renderForm('applicant/new.html.twig', [
             'project' => $project,
@@ -139,7 +130,6 @@ class ApplicantController extends AbstractController
     public function show(Project $project, ProjectCommentRepository $projectCommentRepository, TaskRepository $taskRepository): Response
     {
 
-
         return $this->render('applicant/show.html.twig', [
             'project' => $project,
             'projectComments' => $projectCommentRepository->findBy(['project' => $project]),
@@ -151,13 +141,10 @@ class ApplicantController extends AbstractController
     {
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('applicant', [], Response::HTTP_SEE_OTHER);
         }
-
         return $this->renderForm('applicant/edit.html.twig', [
             'project' => $project,
             'form' => $form,
@@ -185,22 +172,18 @@ class ApplicantController extends AbstractController
         TaskRepository $taskRepository
     ): RedirectResponse {
 
-        // Récupération des tâches associées au projet
         $tasks = $taskRepository->findBy(['project' => $project]);
         $taskData = [];
         foreach ($tasks as $task) {
-            $taskData[] = $task->getDeveloperMail(); // Supposons que cette méthode retourne l'email du développeur
+            $taskData[] = $task->getDeveloperMail();
         }
 
-        // Récupérer l'utilisateur associé au projet
-        $projectOwner = $project->getUser(); // Assurez-vous que la relation User -> Project existe dans votre entité
+        $projectOwner = $project->getUser();
         if (!$projectOwner) {
             $request->getSession()->getFlashBag()->add('error', 'Aucun utilisateur associé à ce projet.');
             return new RedirectResponse($urlGenerator->generate('applicant'));
         }
-        $projectOwnerEmail = $projectOwner->getEmail(); // Récupérer l'email de l'utilisateur
-
-        // Récupération des données du formulaire
+        $projectOwnerEmail = $projectOwner->getEmail();
         $content = $request->request->get('content');
         if (empty($content)) {
             $request->getSession()->getFlashBag()->add('error', 'Le contenu ne peut pas être vide.');
@@ -208,19 +191,14 @@ class ApplicantController extends AbstractController
                 'id' => $project->getId(),
             ]));
         }
-
-        // Création du commentaire
         $comment = new ProjectComment();
         $comment->setContent($content);
         $comment->setProject($project);
         $comment->setUser($security->getUser());
         $comment->setDeveloperEmail($security->getUser()->getEmail());
         $comment->setCreatedAt(new \DateTimeImmutable());
-
         $entityManager->persist($comment);
         $entityManager->flush();
-
-        // Envoi de l'email à tous les destinataires
         $email = (new Email())
             ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
             ->to($projectOwnerEmail) // Email du propriétaire du projet
@@ -228,13 +206,8 @@ class ApplicantController extends AbstractController
             ->subject('Nouveau commentaire sur le projet')
             ->text('Un nouveau commentaire a été ajouté sur le projet.')
             ->html('<p>Un nouveau commentaire a été ajouté sur le projet.</p>');
-
         $mailer->send($email);
-
         $request->getSession()->getFlashBag()->add('success', 'Commentaire ajouté avec succès.');
-
         return new RedirectResponse($urlGenerator->generate('applicant'));
     }
-
-
 }

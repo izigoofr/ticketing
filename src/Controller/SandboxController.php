@@ -45,8 +45,6 @@ class SandboxController extends AbstractController
             $sandbox->setCreatedAt(new \DateTimeImmutable('now'));
             $entityManager->persist($sandbox);
             $entityManager->flush();
-
-            // Récupération des utilisateurs taggés
             $taggedUsers = $sandbox->getTaggedUsers();
             $taggedUserDetails = [];
 
@@ -58,8 +56,6 @@ class SandboxController extends AbstractController
                     $taggedUser->getEmail()
                 );
             }
-
-            // Formatage des utilisateurs taggés pour le mail
             $taggedUsersText = implode("\n- ", $taggedUserDetails); // Texte brut
             $taggedUsersHtml = '<ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $taggedUserDetails)) . '</li></ul>'; // HTML
 
@@ -90,7 +86,6 @@ class SandboxController extends AbstractController
                     htmlspecialchars($sandbox->getCreatedAt()->format('d/m/Y H:i'), ENT_QUOTES),
                     $taggedUsersHtml
                 ));
-
             try {
                 $mailer->send($email);
                 $this->addFlash('success', sprintf(
@@ -100,7 +95,6 @@ class SandboxController extends AbstractController
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'Le projet a été créé, mais une erreur est survenue lors de l\'envoi de l\'email.');
             }
-
             return $this->redirectToRoute('app_sandbox_index', [], Response::HTTP_SEE_OTHER);
         }
         return $this->render('sandbox/new.html.twig', [
@@ -119,15 +113,11 @@ class SandboxController extends AbstractController
         MailerInterface $mailer
     ): Response {
         $comment = new Comment();
-
-        // Formulaire de commentaire
         $form = $formFactory->create(CommentType::class, $comment, [
             'action' => $this->generateUrl('app_sandbox_show', ['id' => $sandbox->getId()]),
             'method' => 'POST',
         ]);
-
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $security->getUser(); // Récupération de l'utilisateur connecté
 
@@ -135,18 +125,12 @@ class SandboxController extends AbstractController
                 $this->addFlash('danger', 'Vous devez être connecté pour commenter.');
                 return $this->redirectToRoute('app_sandbox_show', ['id' => $sandbox->getId()]);
             }
-
-            // Liaison des données
             $comment->setContent($form->get('content')->getData());
             $comment->setUsers($user); // Associe l'utilisateur au commentaire
             $comment->setSandbox($sandbox);
             $comment->setCreateAt(new \DateTimeImmutable());
-
-// Sauvegarde dans la base de données
             $entityManager->persist($comment);
             $entityManager->flush();
-
-            // Notification des utilisateurs
             $taggedUsers = $sandbox->getTaggedUsers();
             $email = (new Email())
                 ->from(new Address('contact@app-prod.fr', 'Florajet sandbox'))
@@ -159,19 +143,14 @@ class SandboxController extends AbstractController
                     $comment->getContent(),
                     $comment->getCreateAt()->format('d/m/Y H:i')
                 ));
-
             try {
                 $mailer->send($email);
                 $this->addFlash('success', 'Votre commentaire a été ajouté et une notification a été envoyée.');
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'Votre commentaire a été ajouté, mais une erreur est survenue lors de l\'envoi de l\'email.');
             }
-
             return $this->redirectToRoute('app_sandbox_show', ['id' => $sandbox->getId()]);
         }
-
-
-
         return $this->render('sandbox/show.html.twig', [
             'sandbox' => $sandbox,
             'commentForm' => $form->createView(),
@@ -179,20 +158,15 @@ class SandboxController extends AbstractController
     }
 
 
-
-
     #[Route('/{id}/edit', name: 'app_sandbox_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Sandbox $sandbox, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(SandboxType::class, $sandbox);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('app_sandbox_index', [], Response::HTTP_SEE_OTHER);
         }
-
         return $this->render('sandbox/edit.html.twig', [
             'sandbox' => $sandbox,
             'form' => $form,
@@ -206,7 +180,6 @@ class SandboxController extends AbstractController
             $entityManager->remove($sandbox);
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('app_sandbox_index', [], Response::HTTP_SEE_OTHER);
     }
 
@@ -217,29 +190,21 @@ class SandboxController extends AbstractController
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $fichier = $request->files->get('upload');
-
         if (!$fichier) {
             return new JsonResponse(['error' => ['message' => 'No file uploaded']], Response::HTTP_BAD_REQUEST);
         }
-
         $extension = strtolower($fichier->getClientOriginalExtension());
         $newFileName = md5(uniqid()) . '.' . $extension;
-
         $path = $parameterBag->get('kernel.project_dir') . '/public/uploads/sandbox';
-
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
-
         try {
             $fichier->move($path, $newFileName);
-
             $link = $request->getSchemeAndHttpHost() . '/uploads/sandbox/' . $newFileName;
-
             return new JsonResponse(['url' => $link]);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => ['message' => 'File upload failed: ' . $e->getMessage()]], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }

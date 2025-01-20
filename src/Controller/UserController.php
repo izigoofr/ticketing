@@ -40,7 +40,6 @@ class UserController extends AbstractController
                     ->getQuery();
             $userList = $query->getResult();
         }else{
-            //get members list
             $userList = $this->userRepository->findAll();
         }
         return $this->render('user/index.html.twig', [
@@ -62,7 +61,6 @@ class UserController extends AbstractController
             ->setPhoneNumber($request->get('phonenumber'))
             ->setState($request->get('state'))
             ->setZipCode($request->get('zipcode'));
-
         $this->manager->persist($user);
         $this->manager->flush();
         return new Response('created');

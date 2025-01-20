@@ -34,8 +34,6 @@ class SmsController extends AbstractController
                 );
                 $texter->send($sms);
                 $smsSent = true;
-
-                // Message de succès
                 $this->addFlash('success', "Le SMS a été envoyé avec succès au numéro : $phoneNumber");
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());

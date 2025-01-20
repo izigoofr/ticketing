@@ -169,9 +169,6 @@ class MemberController extends AbstractController
             'content' => $comment->getContent(),
             'createdAt' => $comment->getCreatedAt()->format('Y-m-d H:m:s')
         ];
-
         return new JsonResponse($data);
     }
-
-
 }

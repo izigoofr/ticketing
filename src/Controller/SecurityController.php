@@ -16,14 +16,10 @@ class SecurityController extends AbstractController
         if ($this->getUser()) {
              return $this->redirectToRoute('profile');
         }
-
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-
         if($error){
             return new Response('Invalid Credential');
         }
-
         return $this->render('security/login.html.twig');
     }
 

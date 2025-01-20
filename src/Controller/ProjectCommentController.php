@@ -75,7 +75,6 @@ final class ProjectCommentController extends AbstractController
             $entityManager->remove($projectComment);
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('app_project_comment_index', [], Response::HTTP_SEE_OTHER);
     }
 }

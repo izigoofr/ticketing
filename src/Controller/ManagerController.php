@@ -97,20 +97,17 @@ class ManagerController extends AbstractController
             return new JsonResponse(['error' => 'User not authenticated'], 403);
         }
 
-        // Récupération des tâches associées au projet
         $tasks = $taskRepository->findBy(['project' => $project]);
         $taskData = [];
         foreach ($tasks as $task) {
-            $taskData[] = $task->getDeveloperMail(); // Supposons que cette méthode retourne l'email du développeur
+            $taskData[] = $task->getDeveloperMail();
         }
-
         $comment->setContent($request->get('content'))
                 ->setProject($project)
                  ->setDeveloperEmail($security->getUser()->getEmail())
                 ->setUser($user)
                 ->setCreatedAt(new \DateTimeImmutable());
         $this->manager->persist($comment);
-
         $this->manager->flush();
         if($comment->getUser()->getImagePath() == null){
             $imagePath = 'assets/img/avatars/no-avatar.png';
@@ -135,7 +132,6 @@ class ManagerController extends AbstractController
                 $comment->getContent()
             ));
         $mailer->send($email);
-
         return new JsonResponse($data);
     }
 
@@ -268,7 +264,6 @@ class ManagerController extends AbstractController
             ->setUser($this->manager->getRepository(User::class)->find($request->get('user_id')));
         $this->manager->persist($task);
         $this->manager->flush();
-        // send email to developer
         $email = (new Email())
             ->from(new Address('contact@app-prod.fr', 'Florajet ticketing'))
             ->to($task->getDeveloperMail())
@@ -301,5 +296,4 @@ class ManagerController extends AbstractController
         $this->manager->flush();
         return new Response('sended');
     }
-
 }

@@ -17,9 +17,6 @@ class TicketingController extends AbstractController
     #[Route('/ticketing', name: 'ticketing')]
     public function index(MailerInterface $mailer): Response
     {
-
-
-// envoyer des mail avec mailtrap
         $email = (new Email())
             ->from(new Address('contact@app-dev.fr', 'Florajet'))
             ->to('franck.stoessel@gmail.com')
@@ -30,13 +27,8 @@ class TicketingController extends AbstractController
         $transport = Transport::fromDsn($_ENV['MAILER_DSN']);
         $mailer = new Mailer($transport);
         $mailer->send($email);
-
-
         return $this->render('ticketing/index.html.twig', [
             'controller_name' => 'TicketingController',
         ]);
-
-
-
     }
 }

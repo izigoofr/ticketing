@@ -29,7 +29,6 @@ class MessageController extends AbstractController
     #[Route('/inbox/{recipent_id}', name: 'inbox')]
     public function index(Security $security, $recipent_id = null): Response
     {
-
         /** @var User */
         $user = $security->getUser();
         $memberList = $this->userRepository->createQueryBuilder('m')
@@ -75,9 +74,6 @@ class MessageController extends AbstractController
             'image' => $message->getSender()->getImagePath() != null ? $message->getSender()->getImagePath() : 'assets/img/avatars/no-avatar.png',
             'createdAt' => $message->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
-
-        // ...
-
         return new JsonResponse($serializedMessage);
     }
 }
