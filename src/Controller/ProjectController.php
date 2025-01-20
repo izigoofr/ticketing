@@ -256,7 +256,7 @@ class ProjectController extends AbstractController
         if (!$projectId) {
             throw $this->createNotFoundException('No project ID provided.');
         }
-        $smsGenerator->sendSmsToProjectUser($projectId);
+        // $smsGenerator->sendSmsToProjectUser($projectId);
         return $this->redirectToRoute('project_list');
     }
 }
