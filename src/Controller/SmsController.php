@@ -2,18 +2,16 @@
 
 namespace App\Controller;
 
-use App\Service\SmsGenerator;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SmsController extends AbstractController
 {
-    //La vue du formulaire d'envoie du sms
     #[Route('/sms', name: 'app_sms_index')]
     public function index(): Response
     {
@@ -25,18 +23,15 @@ class SmsController extends AbstractController
     {
         $smsSent = false;
         $phoneNumber = null;
-
         if ($request->isMethod('POST')) {
             $phoneNumber = $request->request->get('number');
             $messageText = $request->request->get('text');
-
             try {
                 $sms = new SmsMessage(
                     $phoneNumber,
                     $messageText,
-                    'MuSender'
+                    'Florajet'
                 );
-
                 $texter->send($sms);
                 $smsSent = true;
 
