@@ -23,8 +23,6 @@ class SmsGenerator
                 'body' => $message,
             ]
         );
-
-
     }
 
     public function sendSmsToProjectUser(float|bool|int|string|null $projectId)
